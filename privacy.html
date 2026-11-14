@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>سياسة الخصوصية — معركة العقول | Battle of the Minds</title>
+<style>
+  :root {
+    --brand: #6c4df6; --brand2: #00c2a8; --ink: #1c2333; --muted: #64748b;
+    --bg: #f5f6fb; --card: #ffffff; --line: #e5e8f2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0; background: var(--bg); color: var(--ink);
+    font-family: 'Segoe UI', Tahoma, 'Noto Kufi Arabic', 'Cairo', sans-serif;
+    line-height: 1.9;
+  }
+  header {
+    background: linear-gradient(135deg, var(--brand), var(--brand2));
+    color: #fff; text-align: center; padding: 38px 16px 30px;
+  }
+  header .logo { font-size: 44px; }
+  header h1 { margin: 6px 0 4px; font-size: 26px; }
+  header p { margin: 0; opacity: .92; font-size: 14px; }
+  main { max-width: 820px; margin: 0 auto; padding: 24px 16px 60px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 26px 24px; box-shadow: 0 4px 18px rgba(30, 40, 90, .06);
+  }
+  h2 {
+    font-size: 18px; color: var(--brand); margin: 26px 0 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  h2::before { content: ''; width: 8px; height: 22px; border-radius: 4px; background: var(--brand2); }
+  p { margin: 8px 0; font-size: 15.5px; }
+  .meta {
+    text-align: center; color: var(--muted); font-size: 13px;
+    margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--line);
+  }
+  .nav { text-align: center; margin-bottom: 18px; }
+  .nav a {
+    display: inline-block; margin: 0 6px; padding: 8px 18px; border-radius: 999px;
+    text-decoration: none; font-size: 14px; font-weight: 700;
+    color: var(--brand); background: #fff; border: 1.5px solid var(--line);
+  }
+  .nav a.on { color: #fff; background: var(--brand); border-color: var(--brand); }
+  .sync-note { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 10px; }
+  .live-dot { color: var(--brand2); font-weight: 700; }
+  code { direction: ltr; display: inline-block; background: #eef0f8; padding: 2px 8px; border-radius: 6px; font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🧠⚔️</div>
+  <h1>سياسة الخصوصية — معركة العقول</h1>
+  <p>Battle of the Minds · Privacy Policy</p>
+</header>
+<main>
+  <div class="nav">
+    <a href="index.html">🏠 الرئيسية</a>
+    <a href="terms.html">📜 شروط الاستخدام</a>
+    <a class="on" href="privacy.html">🔒 سياسة الخصوصية</a>
+  </div>
+  <div class="card" id="legal-body">
+    <h2>التحميل…</h2>
+  </div>
+  <p class="sync-note"><span class="live-dot">●</span> هذه الصفحة تقرأ النص الرسمي مباشرة من مصدر اللعبة — أي تحديث من إدارة اللعبة يظهر هنا فورًا.</p>
+  <div class="meta" id="legal-meta">آخر تحديث: جاري الفحص…</div>
+</main>
+
+<script type="module">
+  /* ============================================================
+   * 🔒 سياسة الخصوصية — معركة العقول (v31)
+   *  • المصدر الرسمي للنص: وثيقة gameMeta/legal في Firebase —
+   *    نفس المصدر الذي تقرأه شاشة اللعبة الداخلية وتعدّله لوحة الإدارة.
+   *  • إن لم يتصل Firebase (نطاق غير مصرح / بلا شبكة) يعمل النص
+   *    الافتراضي المدمج أدناه (مطابق لافتراضي اللعبة).
+   * ============================================================ */
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+  import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+  import { getFirestore, initializeFirestore, memoryLocalCache, doc, getDoc, onSnapshot }
+    from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBYtXV74wCtZBfKmXDpbWXch66MABx2egQ",
+    authDomain: "battle-of-the-minds.firebaseapp.com",
+    projectId: "battle-of-the-minds",
+    storageBucket: "battle-of-the-minds.firebasestorage.app",
+    messagingSenderId: "208728870791",
+    appId: "1:208728870791:web:9498c610ecbb01df354d22"
+  };
+
+  /* النص الافتراضي (مطابق لافتراضي اللعبة في ui/legal.js) */
+  const DEFAULT_PRIVACY = `## 1. البيانات التي نجمعها
+نجمع الحد الأدنى اللازم لتشغيل اللعبة: اسم اللاعب، الدولة، مستوى التقدم والأرصدة داخل اللعبة، سجل الجولات، وإذا ربطت حسابك بـ Google نحفظ بريدك الإلكتروني لاستعادة تقدمك. لا نجمع أي بيانات حساسة ولا بيانات دفع لأن اللعبة لا تقبل أي أموال من اللاعبين.
+
+## 2. الإعلانات وبيانات الطرف الثالث
+تعرض اللعبة إعلانات مكافآت عبر منصة Google AdMob. عند تشغيل إعلان قد تصل بيانات جهازك ومعرّف الإعلانات (Advertising ID) إلى Google لتقديم الإعلان وقياس أدائه وفق سياسة خصوصية Google وبياناتك، ويمكنك تعطيل تخصيص الإعلانات من إعدادات جهازك. لا نرسل لشركاء الإعلانات أي بيانات من بيانات حسابك داخل اللعبة (اسمك أو أرصدتك).
+
+## 3. كيف نستخدم البيانات
+تُستخدم بياناتك حصرًا لتشغيل اللعبة: حفظ تقدمك، عرض المتصدرين، إدارة الأصدقاء، تسليم الجوائز، الدعم الفني، وحماية اللعبة من الغش عبر تحليل أنماط اللعب الإحصائية (مثل سرعة الإجابة والدقة).
+
+## 4. التخزين والمشاركة
+تُخزن البيانات بأمان على خدمات Google Firebase، ولا نبيع بياناتك ولا نشاركها مع أي طرف ثالث لأغراض إعلانية مباشرة. تُستخدم بيانات التواصل فقط لتسليم جوائزك إن فزت بها.
+
+## 5. حقوقك
+يمكنك في أي وقت تعديل اسمك ودولتك من ملفك الشخصي، أو حذف حسابك نهائيًا بالتواصل مع الدعم الفني أو عبر إدارة اللعبة — وبناءً على طلب الحذف تُحذف كل بياناتك وتُعاد أرصدتك إلى خزنة اللعبة ولا يمكن استرجاعها.
+
+## 6. خصوصية الأطفال
+لا نجمع عمدًا أي بيانات من أطفال دون 13 سنة بدون موافقة ولي الأمر. إن وجدنا حسابًا لطفل دون هذا العمر بلا إذن فقد نحذفه.
+
+## 7. أمان المعلومات
+نستخدم اتصالًا مشفرًا ونسخًا احتياطية لحماية بياناتك، وننصحك بعدم مشاركة كلمة مرور حساب Google المرتبط مع أي شخص.
+
+## 8. تحديث السياسة
+قد نحدّث سياسة الخصوصية من وقت لآخر، وسيظهر النص المحدّث في هذه الشاشة دائمًا.
+
+## 9. التواصل
+لأي سؤال عن الخصوصية أو بياناتك، افتح الدعم الفني من صفحة ملفك الشخصي وأرسل رسالتك — سنرد عليك داخل اللعبة.`;
+
+  const _esc = (s) => String(s ?? '').replace(/[&<>"']/g,
+    ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+
+  function render(text) {
+    document.getElementById('legal-body').innerHTML = String(text || DEFAULT_PRIVACY)
+      .split('\n').map(line => {
+        if (line.startsWith('## ')) return `<h2>${_esc(line.slice(3))}</h2>`;
+        if (!line.trim()) return '';
+        return `<p>${_esc(line)}</p>`;
+      }).join('');
+  }
+
+  function renderMeta(ms) {
+    const el = document.getElementById('legal-meta');
+    if (ms) {
+      const d = new Date(ms);
+      el.textContent = 'آخر تحديث للنصوص: ' + d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+    } else {
+      el.textContent = 'آخر تحديث: النسخة الافتراضية المدمجة';
+    }
+  }
+
+  render(DEFAULT_PRIVACY);          // فوري بالنص المدمج
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = initializeFirestore(getFirestore(app), {
+      localCache: memoryLocalCache(),
+      experimentalAutoDetectLongPolling: true
+    });
+    await signInAnonymously(auth).catch(() => {});
+    const ref = doc(db, 'gameMeta', 'legal');
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      const d = snap.data();
+      if (String(d.privacy || '').trim()) render(d.privacy);
+      renderMeta(d.updatedAt?.toMillis?.() || 0);
+    }
+    onSnapshot(ref, (s) => {       // 🔴 تحديث لحظي
+      if (!s.exists()) return;
+      const d = s.data();
+      if (String(d.privacy || '').trim()) render(d.privacy);
+      renderMeta(d.updatedAt?.toMillis?.() || 0);
+    }, () => {});
+  } catch {
+    /* النطاق غير مصرح به أو بلا شبكة — يبقى النص المدمج */
+  }
+</script>
+</body>
+</html>
