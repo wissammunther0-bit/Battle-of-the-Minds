@@ -1,0 +1,148 @@
+/* ============================================================
+   v30.css — طلبات المستخدم:
+   1) 🔴 لافتة «جديد» نصية على بطاقتي المتجر والحقيبة
+      (كانت نقطة صغيرة — الآن مكتوبة «جديد» وتنبض)
+   2) ⚔️ بطاقات الشخصيات في المتجر أكبر وأوضح — صورة أكبر
+      لتكون مشوقة للشراء واسم أوضح
+   3) 📜 شاشة الشروط وسياسة الخصوصية (نافذة بتبويبين) +
+      رابط الموافقة في شاشة التسجيل + صف في ملف اللاعب
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1) 🔴 شارة «جديد» النصية — لافتة ذهبية صغيرة أعلى البطاقة
+   ------------------------------------------------------------ */
+.dock-badge.txt {
+  top: 6px;
+  inset-inline-start: auto;
+  inset-inline-end: 7px;
+  min-width: 0;
+  height: auto;
+  padding: 3px 9px;
+  font-size: 10px;
+  letter-spacing: .2px;
+  color: #0b0f1f;
+  background: linear-gradient(120deg, #fcd34d, #f59e0b);
+  border: 2px solid #0d1224;
+  box-shadow: 0 3px 12px rgba(245, 158, 11, .55);
+  animation: newBadgePulse 2s ease-in-out infinite;
+}
+@keyframes newBadgePulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.08); }
+}
+
+/* ------------------------------------------------------------
+   2) ⚔️ بطاقات الشخصيات أكبر — صورة تملأ البطاقة وتشوق للشراء
+      (فقط قسم الشخصيات — بطاقات الأدوات تبقى بمقاسها)
+   ------------------------------------------------------------ */
+#store-characters .store-item {
+  flex: 0 0 212px;
+  padding: 20px 14px 14px;
+  gap: 9px;
+}
+#store-characters .sc-media {
+  width: 118px;
+  height: 118px;
+  border-width: 2.5px;
+}
+#store-characters .sc-emoji { font-size: 56px; }
+#store-characters .sc-name { font-size: 15.5px; }
+#store-characters .sc-desc {
+  height: auto;
+  min-height: 30px;
+  font-size: 12px;
+}
+#store-characters .sc-preview {
+  top: 9px;
+  inset-inline-end: 9px;
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+}
+@media (max-width: 360px) {
+  #store-characters .store-item { flex: 0 0 182px; }
+  #store-characters .sc-media { width: 98px; height: 98px; }
+  #store-characters .sc-emoji { font-size: 46px; }
+}
+
+/* ------------------------------------------------------------
+   3) 📜 الشروط وسياسة الخصوصية
+   ------------------------------------------------------------ */
+
+/* رابط الموافقة أسفل شاشة التسجيل */
+.legal-register-link {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: rgba(148, 163, 184, .85);
+  cursor: pointer;
+  padding: 4px 6px;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.legal-register-link b {
+  color: #a78bfa;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 800;
+}
+.legal-register-link:active { opacity: .75; }
+
+/* نافذة العارض — تبويبان: شروط الاستخدام | سياسة الخصوصية */
+.legal-view { text-align: center; }
+.legal-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0 12px;
+}
+.legal-tab {
+  flex: 1;
+  padding: 10px 4px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(147, 51, 234, .3);
+  background: rgba(10, 14, 26, .6);
+  color: #cdd6ee;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  transition: filter .15s, border-color .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.legal-tab.on {
+  background: linear-gradient(135deg, #7c3aed, #3b82f6);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 6px 16px rgba(124, 58, 237, .35);
+}
+.legal-body {
+  max-height: 52vh;
+  overflow-y: auto;
+  text-align: start;
+  padding: 2px 4px;
+  overscroll-behavior: contain;
+}
+.legal-body h4 {
+  margin: 15px 2px 6px;
+  color: #a78bfa;
+  font-size: 14px;
+  font-weight: 900;
+}
+.legal-body h4:first-child { margin-top: 2px; }
+.legal-body p {
+  margin: 6px 2px;
+  font-size: 12.8px;
+  line-height: 1.9;
+  color: #dbe3f5;
+}
+.legal-meta {
+  margin-top: 12px;
+  font-size: 10.5px;
+  color: rgba(148, 163, 184, .8);
+  text-align: center;
+}

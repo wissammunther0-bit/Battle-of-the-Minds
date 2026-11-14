@@ -1,0 +1,1475 @@
+/* ═══════════════════════════════════════════════════════════════
+   v22 — إعادة بناء كاملة لواجهة شاشة اللعب (#view-game)
+   ═══════════════════════════════════════════════════════════════
+   مطابقة 100% مع التصميم المرجعي المرفق — طبقة نهائية تُحمَّل بعد
+   v21.css دون تغيير أي أسماء كلاسات ولا أي HTML/JS.
+
+   المحتويات:
+    1)  الخلفية العامة + الأشعة العلوية + الموجات السفلية
+    2)  زر الانسحاب الأحمر اللامع
+    3)  شارة الجولة الذهبية/السوداء
+    4)  بطاقتا اللاعبين (الصفيحة المشطوفة + الأفاتار + النقاط + الانتصارات)
+    5)  شعار VS الذهبي
+    6)  شريط التقدم بالتعبئتين السماوية/البنفسجية ونقطة الالتقاء
+    7)  العدّاد السداسي الأسود بإطار ذهبي
+    8)  صندوق السؤال الضخم
+    9)  أزرار المساعدة الخمسة
+    10) شبكة الخيارات 2×2
+    11) الفرق الثنائي/الرباعي + الشاشات الصغيرة
+   ============================================================ */
+
+/* ═══════════════ 1) المشهد الخلفي العام ═══════════════ */
+#view-game {
+  background:
+    radial-gradient(ellipse 75% 32% at 50% -4%, rgba(70, 145, 255, .46), transparent 62%),
+    radial-gradient(ellipse 120% 46% at 50% 112%, rgba(2, 10, 44, .90), transparent 72%),
+    linear-gradient(180deg, #0a36c0 0%, #082ba4 22%, #06218a 42%, #041668 62%, #030e46 82%, #03081a 100%);
+}
+/* — أشعة ضوئية تتوزع من أعلى منتصف الشاشة (::before) — */
+#view-game::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 42% 0;
+  pointer-events: none;
+  z-index: 0;
+  background: conic-gradient(from 150deg at 50% -10%,
+    transparent 0deg,  rgba(160, 205, 255, .12) 7deg,  transparent 15deg,
+    transparent 22deg, rgba(160, 205, 255, .17) 30deg, transparent 38deg,
+    transparent 46deg, rgba(160, 205, 255, .10) 54deg, transparent 62deg,
+    transparent 70deg, rgba(160, 205, 255, .14) 78deg, transparent 86deg,
+    transparent 94deg, rgba(160, 205, 255, .08) 102deg, transparent 112deg);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, .55) 48%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, .55) 48%, transparent 100%);
+}
+/* — موجات زرقاء مضيئة أسفل الشاشة (::after) — */
+#view-game::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 34%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(58% 92% at 4% 112%,  rgba(18, 92, 240, .55), transparent 62%),
+    radial-gradient(52% 84% at 97% 116%, rgba(14, 74, 215, .50), transparent 60%),
+    radial-gradient(95% 64% at 50% 132%, rgba(8, 48, 175, .52), transparent 72%);
+}
+#view-game .game-3d {
+  position: relative;
+  background: transparent;
+  overflow: visible;
+}
+/* هالة ضوئية خلف العدّاد */
+#view-game .game-3d::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  width: min(72%, 460px);
+  height: 54px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(50% 100% at 50% 52%, rgba(255, 205, 80, .20), transparent 72%);
+}
+#view-game #arena-stage.arena-stage { background: transparent; overflow: visible; }
+#view-game .arena-stage { overflow: visible; }
+
+/* ═══════════════ 2) زر الانسحاب — أحمر متدرج لامع بإطار ذهبي ═══════════════ */
+#view-game .game-3d > .exit-btn {
+  position: absolute;
+  top: 10px;
+  inset-inline-start: auto;
+  inset-inline-end: 12px;   /* أعلى اليسار في RTL — كما في التصميم */
+  left: 12px;
+  right: auto;
+  z-index: 30;
+  min-width: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px 7px;
+  border: 2.5px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, #ff6470 0%, #f5273c 34%, #cf0e26 62%, #98001a 100%) padding-box,
+    linear-gradient(180deg, #fff2ac 0%, #ffd44d 32%, #eda51b 60%, #a86d08 100%) border-box;
+  color: #fff;
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  text-shadow: 0 1px 2px rgba(80, 0, 10, .55);
+  box-shadow:
+    0 5px 12px rgba(0, 0, 10, .5),
+    0 2px 5px rgba(0, 0, 10, .4),
+    0 0 18px rgba(255, 60, 80, .35);
+  cursor: pointer;
+  overflow: visible;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+#view-game .game-3d > .exit-btn::after {
+  /* لمعة زجاجية علوية */
+  content: '';
+  position: absolute;
+  inset: 2.5px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .40) 0%, rgba(255, 255, 255, .12) 38%, transparent 55%, rgba(120, 0, 15, .26) 100%);
+  pointer-events: none;
+}
+#view-game .game-3d > .exit-btn span,
+#view-game .game-3d > .exit-btn .ex-arrow { position: relative; z-index: 1; }
+#view-game .game-3d > .exit-btn .ex-arrow .ico { width: 15px; height: 15px; display: block; }
+#view-game .game-3d > .exit-btn:hover {
+  filter: brightness(1.07);
+  box-shadow:
+    0 6px 14px rgba(0, 0, 10, .55),
+    0 0 22px rgba(255, 60, 80, .45);
+}
+#view-game .game-3d > .exit-btn:active { transform: translateY(1px) scale(.96); }
+
+/* ═══════════════ 3) شارة الجولة — سوداء بإطار ذهبي ═══════════════ */
+/* 3-أ) الشارة الفعلية (.qm-round) — مثبتة أعلى منتصف الشاشة كما في التصميم */
+#view-game .game-quiz-v2 {
+  position: static;
+}
+#view-game .q-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  order: 0;
+  min-height: 0;
+  margin: 0;
+}
+#view-game .qm-round {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  flex-direction: row-reverse;   /* الكأس في الطرف الأيسر كما في التصميم */
+  justify-content: center;
+  gap: 8px;
+  padding: 4px 20px 5px;
+  border: 2.5px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, #0b0d14 0%, #060810 55%, #03040a 100%) padding-box,
+    linear-gradient(180deg, #fff3b4 0%, #ffd44d 34%, #eda51b 62%, #a86d08 100%) border-box;
+  box-shadow:
+    0 4px 10px rgba(0, 0, 12, .55),
+    0 0 16px rgba(255, 200, 60, .30),
+    inset 0 1px 0 rgba(255, 255, 255, .14);
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .85);
+  white-space: nowrap;
+}
+#view-game .qm-round::after {
+  content: '';
+  position: absolute;
+  inset: 2.5px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .20) 0%, rgba(255, 255, 255, .04) 42%, transparent 60%);
+  pointer-events: none;
+}
+#view-game .qm-round > * { position: relative; z-index: 1; }
+#view-game .qm-round .qmr-trophy {
+  font-size: 15px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .65)) drop-shadow(0 0 6px rgba(255, 200, 60, .55));
+}
+#view-game .qm-round bdi { font-weight: 900; color: #ffe9a8; }
+#view-game .qm-round.sudden {
+  background:
+    linear-gradient(180deg, #180608 0%, #0d0305 100%) padding-box,
+    linear-gradient(180deg, #ffd44d 0%, #ff9d3d 40%, #e8541e 70%, #93280a 100%) border-box;
+}
+/* شريحة «أول إجابة صحيحة تكسب النقطة» — تبقى فوق صندوق السؤال */
+#view-game .qm-chip {
+  padding: 2px 12px 3px;
+  border-radius: 999px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #bcd6ff;
+  background: rgba(2, 10, 34, .55);
+  border: 1px solid rgba(96, 168, 255, .32);
+  white-space: nowrap;
+}
+#view-game .qm-chip.gold {
+  color: #ffe9a8;
+  background: rgba(52, 36, 4, .55);
+  border-color: rgba(255, 200, 70, .42);
+}
+/* 3-ب) الشارة التراثية .duel-head/.duel-round (تصالح إن عادت للـ DOM) */
+#view-game .duel-head {
+  position: absolute;
+  top: clamp(10px, 1.8vh, 18px);
+  left: 0;
+  right: 0;
+  z-index: 4;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+#view-game .duel-round {
+  display: inline-flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  gap: 9px;
+  padding: 5px 20px 6px;
+  border: 2.5px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, #0b0d14 0%, #060810 55%, #03040a 100%) padding-box,
+    linear-gradient(180deg, #fff3b4 0%, #ffd44d 34%, #eda51b 62%, #a86d08 100%) border-box;
+  box-shadow:
+    0 4px 10px rgba(0, 0, 12, .55),
+    0 0 16px rgba(255, 200, 60, .30),
+    inset 0 1px 0 rgba(255, 255, 255, .14);
+  font-family: 'Cairo', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .85);
+  white-space: nowrap;
+}
+#view-game .duel-round svg { display: none; }
+#view-game .duel-round .duel-trophy {
+  font-size: 17px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .65)) drop-shadow(0 0 6px rgba(255, 200, 60, .55));
+}
+
+/* ═══════════════ 4) بطاقتا اللاعبين — صفيحة مشطوفة Clip-path ═══════════════ */
+#view-game .duel-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  gap: 6px;
+  padding: clamp(42px, 5vh, 54px) clamp(12px, 3vw, 28px) clamp(74px, 9.4vh, 94px);
+}
+#view-game .duel-row {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: row-reverse;  /* أنا (أزرق) يسارًا / الخصم (بنفسجي) يمينًا — كما في التصميم */
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 4px;
+}
+#view-game .duel-side {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 5px;
+  padding: 9px 12px 9px;
+  background: none;
+  border: none;
+  box-shadow: none;
+  isolation: isolate;
+}
+#view-game .duel-side::before { display: none; }
+
+/* — صفيحة الإطار المشطوفة (عنصر مستقل يسمح للأفاتار بالبروز) — */
+#view-game .ds-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  clip-path: polygon(17% 0%, 83% 0%, 100% 27%, 100% 84%, 92% 100%, 8% 100%, 0% 84%, 0% 27%);
+  filter: drop-shadow(0 7px 14px rgba(0, 0, 14, .55));
+}
+/* اللاعب — إطار أزرق فاتح معدني لامع + هالة زرقاء */
+#view-game .duel-side.me .ds-frame {
+  background: linear-gradient(180deg, #e8f8ff 0%, #7fd6ff 22%, #2f9df6 46%, #0a5fe0 70%, #0a3fae 100%);
+  filter: drop-shadow(0 7px 14px rgba(0, 0, 14, .55)) drop-shadow(0 0 12px rgba(40, 160, 255, .40));
+}
+/* الخصم — إطار بنفسجي وردي معدني لامع + هالة بنفسجية */
+#view-game .duel-side.opp .ds-frame {
+  background: linear-gradient(180deg, #ffe2fb 0%, #f581f4 22%, #d02ef2 46%, #9212dd 70%, #64089e 100%);
+  filter: drop-shadow(0 7px 14px rgba(0, 0, 14, .55)) drop-shadow(0 0 12px rgba(210, 70, 245, .40));
+}
+#view-game .ds-frame::before {
+  /* الحشوة الداخلية الملوّنة */
+  content: '';
+  position: absolute;
+  inset: 3.5px;
+  clip-path: polygon(17% 0%, 83% 0%, 100% 27%, 100% 84%, 92% 100%, 8% 100%, 0% 84%, 0% 27%);
+}
+#view-game .duel-side.me .ds-frame::before {
+  background:
+    radial-gradient(130% 66% at 20% 0%, rgba(120, 215, 255, .38), transparent 56%),
+    linear-gradient(180deg, #0d5ff2 0%, #0a45cc 40%, #0630a2 72%, #041f74 100%);
+}
+#view-game .duel-side.opp .ds-frame::before {
+  background:
+    radial-gradient(130% 66% at 80% 0%, rgba(255, 140, 240, .36), transparent 56%),
+    linear-gradient(180deg, #b626ff 0%, #8d13e2 40%, #6b0bb8 72%, #4c0896 100%);
+}
+#view-game .ds-frame::after {
+  /* لمعة زجاجية علوية */
+  content: '';
+  position: absolute;
+  inset: 3.5px;
+  clip-path: polygon(17% 0%, 83% 0%, 100% 27%, 100% 84%, 92% 100%, 8% 100%, 0% 84%, 0% 27%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .36) 0%, rgba(255, 255, 255, .10) 30%, transparent 48%);
+  pointer-events: none;
+}
+#view-game .duel-side > *:not(.ds-frame) { position: relative; z-index: 1; }
+
+/* — الأفاتار الدائري البارز فوق الحافة العلوية — */
+#view-game .ds-chips {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: -4px 0 0;
+  min-height: 54px;
+  flex: 0 0 auto;
+}
+#view-game .ds-chip {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 6px;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+#view-game .ds-chip.me,
+#view-game .ds-chip.opp { justify-content: space-between; }
+#view-game .ds-chip.me  { flex-direction: row-reverse; }  /* الأفاتار عند الحافة اليسرى */
+#view-game .ds-chip.opp { flex-direction: row; }          /* الأفاتار عند الحافة اليمنى */
+#view-game .ds-av {
+  flex: 0 0 auto;
+  width: 72px;
+  height: 72px;
+  margin-top: -18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 40px;
+  line-height: 1;
+  border: 3.5px solid #4fd8ff;
+  background: radial-gradient(130% 130% at 50% 22%, #1461d8 0%, #0a35a0 55%, #061f6c 100%);
+  box-shadow:
+    0 0 0 2.5px rgba(8, 16, 52, .95),
+    0 0 18px rgba(64, 220, 255, .60),
+    0 6px 14px rgba(0, 0, 16, .55);
+  overflow: hidden;
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0, 0, 20, .4);
+}
+#view-game .duel-side.me .ds-av { border-color: #4fd8ff; }
+#view-game .duel-side.opp .ds-av {
+  border-color: #f45cf0;
+  box-shadow:
+    0 0 0 2.5px rgba(24, 6, 54, .95),
+    0 0 18px rgba(244, 92, 240, .60),
+    0 6px 14px rgba(0, 0, 16, .55);
+}
+#view-game .ds-av img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+#view-game .ds-av-flag { display: grid; place-items: center; background: rgba(3, 18, 52, .9); }
+
+/* — الاسم + شارة المستوى (نحو المنتصف) — */
+#view-game .ds-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding-top: 14px;
+  flex: 1 1 auto;
+}
+#view-game .ds-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Cairo', sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 26, .75), 0 0 12px rgba(90, 180, 255, .35);
+}
+#view-game .ds-lvl {
+  padding: 2px 13px 3px;
+  border-radius: 999px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #eaf6ff;
+  background: rgba(3, 14, 44, .82);
+  border: 1.5px solid rgba(79, 216, 255, .80);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, .14), 0 2px 5px rgba(0, 0, 14, .4);
+  white-space: nowrap;
+}
+#view-game .duel-side.opp .ds-lvl {
+  border-color: rgba(244, 92, 240, .80);
+  background: rgba(22, 5, 50, .82);
+}
+#view-game .ds-frozen {
+  position: absolute;
+  top: -14px;
+  inset-inline-end: 2px;
+  font-size: 17px;
+  filter: drop-shadow(0 0 6px rgba(120, 220, 255, .9));
+  z-index: 3;
+}
+#view-game .ds-frozen.hidden { display: none; }
+
+/* — لوحة النقاط: رقم ضخم أبيض على لوح داكن بحافة ملوّنة لامعة — */
+#view-game .ds-score {
+  margin: 2px 10px 0;
+  padding: 2px 10px 4px;
+  border-radius: 15px;
+  text-align: center;
+  font-family: 'Cairo', sans-serif;
+  font-size: 37px;
+  font-weight: 900;
+  line-height: 1.12;
+  color: #fff !important;
+  text-shadow: 0 0 16px rgba(255, 255, 255, .38), 0 2px 4px rgba(0, 0, 20, .6);
+  background: linear-gradient(180deg, rgba(3, 11, 34, .92) 0%, rgba(2, 7, 24, .95) 100%);
+  box-shadow:
+    inset 0 0 0 2px rgba(79, 200, 255, .75),
+    inset 0 3px 8px rgba(0, 0, 10, .68),
+    inset 0 -1px 0 rgba(255, 255, 255, .10),
+    0 0 12px rgba(64, 200, 255, .30),
+    0 2px 6px rgba(0, 0, 12, .45);
+}
+#view-game .duel-side.me .ds-score {
+  box-shadow:
+    inset 0 0 0 2px rgba(79, 200, 255, .75),
+    inset 0 3px 8px rgba(0, 0, 10, .68),
+    inset 0 0 18px rgba(40, 140, 255, .26),
+    0 0 12px rgba(64, 200, 255, .30),
+    0 2px 6px rgba(0, 0, 12, .45);
+}
+#view-game .duel-side.opp .ds-score {
+  box-shadow:
+    inset 0 0 0 2px rgba(238, 96, 240, .75),
+    inset 0 3px 8px rgba(0, 0, 10, .68),
+    inset 0 0 18px rgba(200, 60, 255, .26),
+    0 0 12px rgba(226, 80, 240, .30),
+    0 2px 6px rgba(0, 0, 12, .45);
+}
+
+/* — كبسولة الانتصارات السفلية الداكنة بإطار ذهبي — */
+#view-game .ds-career-wins {
+  margin: 0 6px;
+  padding: 3px 14px 4px;
+  border-radius: 999px;
+  display: flex;
+  flex-direction: row-reverse;   /* الكأس في الطرف الأيسر كما في التصميم */
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(180deg, rgba(6, 15, 44, .94) 0%, rgba(3, 9, 28, .96) 100%) padding-box,
+    linear-gradient(180deg, #ffe487 0%, #f5b62e 55%, #c07c0a 100%) border-box;
+  font-family: 'Cairo', sans-serif;
+  box-shadow: 0 3px 7px rgba(0, 0, 12, .45), inset 0 1px 0 rgba(255, 255, 255, .12);
+}
+#view-game .duel-side.opp .ds-career-wins {
+  border-color: transparent;
+}
+#view-game .ds-career-wins > span:first-child {
+  font-size: 16px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .55)) drop-shadow(0 0 5px rgba(255, 200, 60, .45));
+}
+#view-game .ds-career-wins .dw-c {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.25;
+}
+#view-game .ds-career-wins .dw-c span {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffe9a8;
+  text-shadow: 0 1px 2px rgba(0, 0, 10, .65);
+}
+#view-game .ds-career-wins .dw-c b {
+  font-size: 15px;
+  font-weight: 900;
+  color: #fff;
+}
+
+/* ═══════════════ 5) شعار VS الذهبي المتوهج ═══════════════ */
+#view-game .duel-vs {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  pointer-events: none;
+  width: 66px;
+  text-align: center;
+  font-family: 'Cairo', sans-serif;
+  font-size: 43px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 1px;
+  background: linear-gradient(180deg, #fff8cf 0%, #ffe063 34%, #ffb924 58%, #c97d08 84%, #8f5604 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  filter:
+    drop-shadow(0 2px 0 #7a4a02)
+    drop-shadow(0 4px 9px rgba(0, 0, 10, .60))
+    drop-shadow(0 0 16px rgba(255, 200, 70, .60));
+  animation: v22-vs-pulse 2.4s ease-in-out infinite;
+}
+@keyframes v22-vs-pulse {
+  0%, 100% { scale: 1; }
+  50%      { scale: 1.09; }
+}
+
+/* ═══════════════ 6) شريط التقدم — كبسولة بإطار ذهبي سميك ═══════════════ */
+/* مثبت أعلى العدّاد مباشرة — لا يتأثر بارتفاع البطاقات في أي شاشة */
+#view-game .duel-bar {
+  position: absolute;
+  left: clamp(12px, 3vw, 28px);
+  right: clamp(12px, 3vw, 28px);
+  bottom: clamp(62px, 8.5vh, 70px);
+  height: clamp(22px, 3.2vh, 27px);
+  margin: 0;
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background:
+    linear-gradient(180deg, #061234 0%, #030a20 100%) padding-box,
+    linear-gradient(180deg, #fff2a8 0%, #ffd44d 30%, #f2ac1d 55%, #a86d08 100%) border-box;
+  box-shadow:
+    0 6px 13px rgba(0, 0, 14, .55),
+    0 0 18px rgba(255, 200, 60, .25),
+    inset 0 3px 5px rgba(0, 0, 10, .65);
+  overflow: hidden;
+}
+#view-game .duel-bar .vb-ticks { display: none; }
+#view-game .duel-bar .vb-fill {
+  position: absolute;
+  top: 2.5px;
+  bottom: 2.5px;
+  border-radius: 999px;
+}
+/* التعبئة السماوية — أنا — من اليسار (كما في التصميم المرجعي) */
+#view-game .duel-bar .vb-fill.me {
+  inset-inline-start: auto;
+  inset-inline-end: auto;
+  left: 2.5px;
+  right: auto;
+  background: linear-gradient(90deg, #0768d6 0%, #18b4f8 50%, #3ed2ff 80%, #b8f6ff 100%);
+  box-shadow:
+    0 0 12px rgba(40, 200, 255, .60),
+    inset 0 2px 3px rgba(255, 255, 255, .40),
+    inset 0 -2px 4px rgba(0, 40, 110, .45);
+}
+/* التعبئة البنفسجية — الخصم — من اليمين */
+#view-game .duel-bar .vb-fill.opp {
+  inset-inline-start: auto;
+  inset-inline-end: auto;
+  left: auto;
+  right: 2.5px;
+  background: linear-gradient(270deg, #8a10e8 0%, #b41ff5 50%, #e04dff 80%, #ffa8f5 100%);
+  box-shadow:
+    0 0 12px rgba(226, 70, 250, .60),
+    inset 0 2px 3px rgba(255, 255, 255, .38),
+    inset 0 -2px 4px rgba(60, 0, 110, .45);
+}
+#view-game .duel-bar .vb-pct { display: none; }
+#view-game .duel-bar .vb-sword { display: none; }
+/* نقطة الالتقاء — توهج أبيض نابض في المنتصف */
+#view-game .duel-bar .vb-seam {
+  position: absolute;
+  top: 50%;
+  width: 0;
+  height: 0;
+  inset-inline-start: auto;
+  inset-inline-end: auto;
+  transform: translate(-50%, -50%);
+  transition: left .75s cubic-bezier(.22, 1.2, .36, 1);
+  z-index: 2;
+}
+#view-game .duel-bar .vb-seam::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle,
+    rgba(255, 255, 255, .98) 0%,
+    rgba(255, 255, 255, .55) 26%,
+    rgba(255, 220, 140, .25) 50%,
+    transparent 70%);
+  border-radius: 50%;
+  filter: blur(.4px);
+  animation: v22-seam 2s ease-in-out infinite;
+}
+#view-game .duel-bar .vb-seam::after {
+  content: '✦';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -54%);
+  font-size: 15px;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, .95), 0 0 15px rgba(255, 220, 120, .85);
+}
+@keyframes v22-seam {
+  0%, 100% { opacity: .75; transform: translate(-50%, -50%) scale(1); }
+  50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.18); }
+}
+#view-game .duel-bar .vb-sparks { position: absolute; inset: 0; pointer-events: none; }
+#view-game .duel-bar .vb-sparks .spark {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  top: 50%;
+}
+#view-game .duel-bar .vb-sparks .spark.me  { background: #7deaff; box-shadow: 0 0 8px #22c8ff; }
+#view-game .duel-bar .vb-sparks .spark.opp { background: #ff8ae4; box-shadow: 0 0 8px #ef3fe0; }
+
+/* توهج البطاقة المتقدمة */
+#view-game .duel-side.leading.me .ds-frame {
+  filter: drop-shadow(0 7px 14px rgba(0, 0, 14, .55)) drop-shadow(0 0 14px rgba(40, 200, 255, .50));
+}
+#view-game .duel-side.leading.opp .ds-frame {
+  filter: drop-shadow(0 7px 14px rgba(0, 0, 14, .55)) drop-shadow(0 0 14px rgba(240, 80, 240, .50));
+}
+
+/* ═══════════════ 7) العدّاد السداسي — أسود بإطار ذهبي سميك ═══════════════ */
+#view-game .game-3d > .timer {
+  position: absolute;
+  left: 50%;
+  top: auto;
+  bottom: 6px;
+  transform: translateX(-50%);
+  z-index: 25;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 172px;
+  height: 54px;
+  padding: 0 30px;
+  border: none;
+  border-radius: 0;
+  background: linear-gradient(180deg, #fff2a8 0%, #ffd44d 30%, #f2ac1d 55%, #a86d08 100%);
+  clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 14, .55)) drop-shadow(0 0 16px rgba(255, 200, 60, .30));
+}
+#view-game .game-3d > .timer::before {
+  /* الحشوة الداخلية السوداء داخل الإطار الذهبي */
+  content: '';
+  position: absolute;
+  inset: 3.5px;
+  clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+  background: linear-gradient(180deg, #0d0f1c 0%, #070812 55%, #030309 100%);
+}
+#view-game .game-3d > .timer::after {
+  /* لمعة زجاجية خفيفة */
+  content: '';
+  position: absolute;
+  inset: 3.5px;
+  clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .16) 0%, rgba(255, 255, 255, .03) 42%, transparent 58%);
+  pointer-events: none;
+}
+#view-game .game-3d > .timer .tm-num,
+#view-game .game-3d > .timer .tm-ico { position: relative; z-index: 1; }
+#view-game .game-3d > .timer .tm-num {
+  font-family: 'Cairo', sans-serif;
+  font-size: 31px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 14px rgba(255, 255, 255, .38), 0 2px 4px rgba(0, 0, 0, .7);
+  min-width: 44px;
+  text-align: center;
+}
+#view-game .game-3d > .timer .tm-ico { color: #ffd44d; display: flex; }
+#view-game .game-3d > .timer .tm-ico svg {
+  width: 27px;
+  height: 27px;
+  filter: drop-shadow(0 0 7px rgba(255, 200, 60, .65));
+}
+#view-game .game-3d > .timer::marker { content: none; }
+#view-game .game-3d > .timer.warning { animation: v22-warn .9s ease-in-out infinite; }
+#view-game .game-3d > .timer.warning .tm-num {
+  color: #ff5c6e;
+  text-shadow: 0 0 14px rgba(255, 70, 90, .85);
+}
+@keyframes v22-warn {
+  0%, 100% { filter: drop-shadow(0 6px 12px rgba(0, 0, 14, .55)) drop-shadow(0 0 10px rgba(255, 200, 60, .30)); }
+  50%      { filter: drop-shadow(0 6px 12px rgba(0, 0, 14, .55)) drop-shadow(0 0 18px rgba(255, 70, 90, .70)); }
+}
+
+/* ═══════════════ 8) قسم الأسئلة — ترتيب مطابق للتصميم ═══════════════ */
+#view-game .game-quiz-v2 {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 14px 14px;
+  gap: 7px;
+  /* position/backdrop-filter: static + none — ضروري ليثبت .qm-round
+     أعلى الشاشة (backdrop-filter كان يصنع containing block) */
+  position: static;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  overflow: visible;
+  background: transparent;
+  border-top: none;
+}
+#view-game .quiz-topbar { order: 2; margin: 0; padding: 0; }   /* الأدوات بعد السؤال */
+#view-game #q-meta      { order: 0; }
+#view-game #q-text      { order: 1; }
+#view-game #q-options   { order: 3; }
+
+/* — صندوق السؤال الضخم: مثمن الأركان (زوايا مشطوفة) بإطار ذهبي سميك —
+     الحيلة: خلفية العنصر = الإطار الذهبي، و::before = الحشوة الداخلية — */
+#view-game .question-text {
+  position: relative;
+  order: 1;
+  margin: 0;
+  min-height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 13px 26px;
+  border: none;
+  border-radius: 0;
+  isolation: isolate;
+  clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px),
+                     calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px);
+  background: linear-gradient(180deg, #fff2a8 0%, #ffd44d 30%, #f2ac1d 55%, #a86d08 100%);
+  font-family: 'Cairo', sans-serif;
+  font-size: clamp(19px, 3.3vh, 27px);
+  font-weight: 800;
+  line-height: 1.5;
+  color: #fff;
+  text-shadow: 0 2px 5px rgba(0, 0, 26, .65);
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 16, .55)) drop-shadow(0 0 20px rgba(255, 200, 60, .22));
+}
+#view-game .question-text::before {
+  /* الحشوة الداخلية الزرقاء الداكنة + خط داخلي فاتح */
+  content: '';
+  position: absolute;
+  inset: 3.5px;
+  width: auto;
+  height: auto;      /* نُبطل height: 2px القديمة من v19 */
+  border-radius: 0;
+  z-index: -1;
+  clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px),
+                     calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px);
+  background:
+    radial-gradient(150% 175% at 50% -24%, #0e46c2 0%, #0931a0 46%, #052376 100%);
+  box-shadow:
+    inset 0 0 0 2px rgba(3, 10, 38, .9),
+    inset 0 0 0 3.5px rgba(80, 170, 255, .40),
+    inset 0 12px 18px rgba(90, 165, 255, .28),
+    inset 0 -8px 14px rgba(0, 10, 50, .45);
+}
+#view-game .question-text::after {
+  content: '';
+  position: absolute;
+  inset: 3.5px;
+  width: auto;
+  height: auto;
+  z-index: 0;
+  clip-path: polygon(13px 0, calc(100% - 13px) 0, 100% 13px, 100% calc(100% - 13px),
+                     calc(100% - 13px) 100%, 13px 100%, 0 calc(100% - 13px), 0 13px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .26) 0%, rgba(255, 255, 255, .07) 34%, transparent 52%);
+  pointer-events: none;
+}
+#view-game .question-text > * { position: relative; z-index: 1; }
+
+/* ═══════════════ 9) أزرار المساعدة الخمسة اللامعة ═══════════════ */
+#view-game .q-tools {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  overflow: visible;
+  padding: 0;
+}
+#view-game .q-tools:empty { display: none; }
+#view-game .q-tool {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 9px 4px 8px;
+  border: 2.5px solid transparent;
+  border-radius: 17px;
+  background:
+    radial-gradient(135% 125% at 50% -16%, #1160f2 0%, #0a3cc4 55%, #06279a 100%) padding-box,
+    linear-gradient(180deg, #9fdcff 0%, #4fb4ff 45%, #1f7ae8 100%) border-box;
+  box-shadow:
+    0 5px 11px rgba(0, 0, 14, .48),
+    0 0 12px rgba(60, 170, 255, .30),
+    inset 0 1px 0 rgba(255, 255, 255, .14);
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  transition: transform .12s ease, filter .12s ease;
+}
+#view-game .q-tool::after {
+  content: '';
+  position: absolute;
+  inset: 2.5px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .30) 0%, rgba(255, 255, 255, .07) 38%, transparent 55%);
+  pointer-events: none;
+}
+#view-game .q-tool > * { position: relative; z-index: 1; }
+#view-game .q-tool:active { transform: translateY(1px) scale(.96); }
+#view-game .q-tool:hover { filter: brightness(1.1); }
+
+/* زر التخطي — بنفسجي مميز بإطار وردي */
+#view-game .q-tool.tool-skip {
+  background:
+    radial-gradient(135% 125% at 50% -16%, #b02bff 0%, #8a12e0 55%, #5c0aa8 100%) padding-box,
+    linear-gradient(180deg, #f0aaff 0%, #e060ff 45%, #b81ff0 100%) border-box;
+  box-shadow:
+    0 5px 11px rgba(0, 0, 14, .48),
+    0 0 14px rgba(210, 80, 255, .40),
+    inset 0 1px 0 rgba(255, 255, 255, .16);
+}
+#view-game .qt-ico {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+}
+#view-game .qt-ico .ico,
+#view-game .qt-ico svg { width: 25px; height: 25px; }
+#view-game .q-tool .qt-ico { color: #52e6ff; filter: drop-shadow(0 0 6px rgba(60, 220, 255, .60)); }
+#view-game .q-tool.tool-skip .qt-ico { color: #ffd7ff; filter: drop-shadow(0 0 6px rgba(255, 190, 255, .60)); }
+#view-game .qt-ico-sm { display: inline-flex; margin-inline-end: 1px; }
+#view-game .qt-ico-sm .ico { width: 15px !important; height: 15px !important; }
+#view-game .qt-ico-dbl { display: inline-flex; }
+#view-game .qt-ico-dbl .ico { width: 22px !important; height: 22px !important; }
+#view-game .qt-ico-dbl .ico + .ico { margin-inline-start: -7px; }
+#view-game .qt-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 22, .65);
+  text-align: center;
+}
+#view-game .qt-label small { font-size: 9.5px; font-weight: 700; color: #dbeaff; white-space: nowrap; }
+/* شارة العدد الذهبية في الزاوية العلوية */
+#view-game .qt-count {
+  position: absolute;
+  top: -7px;
+  inset-inline-end: -5px;
+  z-index: 2;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 5px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-family: 'Cairo', sans-serif;
+  font-size: 11.5px;
+  font-weight: 900;
+  color: #5a3603;
+  background: linear-gradient(180deg, #fff3b0 0%, #ffd44d 55%, #eda51b 100%);
+  border: 1.5px solid #fff2ac;
+  box-shadow: 0 2px 5px rgba(0, 0, 12, .5), 0 0 9px rgba(255, 200, 60, .55);
+}
+
+/* ═══════════════ 10) شبكة الخيارات 2×2 بإطارات ذهبية لامعة ═══════════════ */
+#view-game .options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(2, minmax(54px, 1fr));
+  align-content: stretch;
+  gap: 12px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+#view-game .option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 8px 48px;
+  border: 3.5px solid transparent;
+  border-radius: 20px;
+  background:
+    radial-gradient(150% 160% at 50% -20%, #1468f2 0%, #0b3fc0 48%, #062a8e 100%) padding-box,
+    linear-gradient(180deg, #fff2a8 0%, #ffd44d 30%, #f2ac1d 55%, #a86d08 100%) border-box;
+  box-shadow:
+    inset 0 0 0 2.5px rgba(2, 8, 34, .85),
+    inset 0 9px 13px rgba(120, 190, 255, .32),
+    inset 0 -6px 11px rgba(0, 10, 50, .42),
+    0 6px 13px rgba(0, 0, 16, .5),
+    0 0 16px rgba(255, 200, 60, .16);
+  cursor: pointer;
+  font-family: 'Cairo', sans-serif;
+  transition: transform .12s ease, filter .12s ease;
+}
+#view-game .option::after {
+  content: '';
+  position: absolute;
+  inset: 3.5px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .30) 0%, rgba(255, 255, 255, .08) 36%, transparent 52%);
+  pointer-events: none;
+}
+#view-game .option > * { position: relative; z-index: 1; }
+#view-game .option:active { transform: scale(.97); }
+#view-game .option:hover { filter: brightness(1.1); }
+#view-game .option:disabled { cursor: default; }
+
+#view-game .opt-text {
+  font-family: 'Cairo', sans-serif;
+  font-size: clamp(16px, 2.8vh, 21px);
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 26, .6);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  max-height: 3em;
+  line-height: 1.4;
+}
+/* حرف الإجابة داخل دائرة على يمين الزر (بداية RTL) */
+#view-game .opt-letter {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 10px;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: 'Cairo', sans-serif;
+  font-size: 19px;
+  font-weight: 900;
+  color: #fff;
+  background: radial-gradient(130% 130% at 50% 18%, #0e3f9e 0%, #082566 60%, #051640 100%);
+  border: 2.5px solid #52e6ff;
+  box-shadow:
+    0 0 11px rgba(64, 220, 255, .55),
+    inset 0 2px 4px rgba(0, 0, 20, .5),
+    0 2px 5px rgba(0, 0, 14, .4);
+  text-shadow: 0 1px 3px rgba(0, 0, 20, .6);
+}
+
+/* — حالات الإجابة الصحيحة/الخاطئة — */
+#view-game .option.correct {
+  background:
+    radial-gradient(150% 160% at 50% -20%, #16c46a 0%, #0d9a50 48%, #07663a 100%) padding-box,
+    linear-gradient(180deg, #d8ffc8 0%, #7fe86a 45%, #3aa32b 100%) border-box;
+  box-shadow:
+    inset 0 0 0 2.5px rgba(2, 30, 12, .8),
+    inset 0 9px 13px rgba(160, 255, 170, .30),
+    0 6px 16px rgba(10, 120, 50, .5),
+    0 0 22px rgba(60, 230, 110, .55);
+}
+#view-game .option.wrong {
+  background:
+    radial-gradient(150% 160% at 50% -20%, #f2506a 0%, #cc1030 48%, #8a0a20 100%) padding-box,
+    linear-gradient(180deg, #ffd0d0 0%, #ff8a8a 45%, #d03040 100%) border-box;
+  box-shadow:
+    inset 0 0 0 2.5px rgba(40, 2, 8, .8),
+    inset 0 9px 13px rgba(255, 170, 170, .28),
+    0 6px 16px rgba(120, 10, 25, .5),
+    0 0 22px rgba(255, 80, 100, .55);
+}
+
+/* ═══════════════ 11) الفرق الثنائي/الرباعي والشاشات الصغيرة ═══════════════ */
+#view-game .duel-row.duo .ds-av,
+#view-game .duel-row.squad .ds-av {
+  width: 48px;
+  height: 48px;
+  margin-top: -10px;
+  font-size: 23px;
+  border-width: 2.5px;
+}
+#view-game .duel-row.duo .ds-chips,
+#view-game .duel-row.squad .ds-chips { min-height: 42px; gap: 4px; }
+#view-game .duel-row.duo .ds-name,
+#view-game .duel-row.squad .ds-name { font-size: 13.5px; }
+#view-game .duel-row.duo .ds-lvl,
+#view-game .duel-row.squad .ds-lvl { font-size: 10px; padding: 1px 8px 2px; }
+#view-game .duel-row.duo .ds-meta,
+#view-game .duel-row.squad .ds-meta { padding-top: 6px; }
+#view-game .duel-row.squad .ds-chips { flex-wrap: wrap; }
+#view-game .duel-row.squad .ds-chip { flex: 1 1 40%; }
+#view-game .duel-row.duo .ds-score,
+#view-game .duel-row.squad .ds-score { font-size: 28px; }
+
+/* — شاشات ضيقة — */
+@media (max-width: 380px) {
+  #view-game .ds-av { width: 58px; height: 58px; margin-top: -13px; font-size: 28px; }
+  #view-game .ds-name { font-size: 14.5px; }
+  #view-game .ds-lvl { font-size: 11px; padding: 1px 9px 2px; }
+  #view-game .ds-meta { padding-top: 8px; }
+  #view-game .ds-score { font-size: 29px; }
+  #view-game .ds-career-wins .dw-c span { font-size: 11px; }
+  #view-game .duel-vs { font-size: 30px; width: 48px; }
+  #view-game .question-text { font-size: 20px; }
+  #view-game .opt-text { font-size: 16.5px; }
+  #view-game .opt-letter { width: 33px; height: 33px; font-size: 15.5px; inset-inline-start: 8px; }
+  #view-game .option { padding: 8px 42px; }
+}
+
+/* — شاشات قصيرة — */
+@media (max-height: 760px) {
+  #view-game .game-3d > .exit-btn { padding: 4px 13px 5px; font-size: 12.5px; }
+  #view-game .game-3d > .exit-btn .ex-arrow .ico { width: 14px; height: 14px; }
+  #view-game .qm-round { font-size: 12.5px; padding: 2px 14px 3px; }
+  #view-game .ds-av { width: 62px; height: 62px; margin-top: -15px; font-size: 31px; }
+  #view-game .ds-name { font-size: 15.5px; }
+  #view-game .ds-meta { padding-top: 8px; }
+  #view-game .ds-score { font-size: 30px; }
+  #view-game .ds-career-wins { padding: 3px 11px 4px; }
+  #view-game .ds-career-wins .dw-c span { font-size: 10.5px; }
+  #view-game .ds-career-wins .dw-c b { font-size: 13px; }
+  #view-game .duel-vs { font-size: 30px; width: 50px; }
+  #view-game .question-text { min-height: 72px; font-size: 20px; }
+  #view-game .opt-text { font-size: 17px; }
+  #view-game .opt-letter { width: 33px; height: 33px; font-size: 15.5px; }
+  #view-game .option { min-height: 48px; padding: 6px 42px; }
+}
+@media (max-height: 700px) {
+  #view-game .duel-wrap { padding: clamp(40px, 4.6vh, 46px) clamp(12px, 3vw, 28px) clamp(54px, 8.6vh, 62px); }
+  #view-game .duel-side { padding: 5px 9px 5px; gap: 3px; }
+  #view-game .ds-av { width: 46px; height: 46px; margin-top: -9px; font-size: 22px; }
+  #view-game .ds-chips { min-height: 38px; margin-top: -2px; }
+  #view-game .ds-name { font-size: 13px; }
+  #view-game .ds-meta { padding-top: 4px; gap: 2px; }
+  #view-game .ds-lvl { font-size: 9.5px; padding: 1px 7px 1px; }
+  #view-game .ds-score { font-size: 23px; margin: 1px 8px 0; padding: 1px 8px 2px; }
+  #view-game .ds-career-wins { padding: 1px 8px 2px; gap: 5px; }
+  #view-game .ds-career-wins > span:first-child { font-size: 12px; }
+  #view-game .ds-career-wins .dw-c span { font-size: 9px; }
+  #view-game .ds-career-wins .dw-c b { font-size: 11px; }
+  #view-game .duel-vs { font-size: 28px; width: 44px; }
+  #view-game .game-3d > .timer { min-width: 124px; height: 44px; bottom: 5px; }
+  #view-game .game-3d > .timer .tm-num { font-size: 21px; }
+  #view-game .game-3d > .timer .tm-ico svg { width: 19px; height: 19px; }
+  #view-game .question-text { min-height: 56px; font-size: 17px; }
+  #view-game .option { min-height: 42px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   💡 خيار قلب جهة اللاعبين (معطَّل افتراضيًا):
+   التصميم المرجعي يضع اللاعب «أنا» أزرق يسارًا والخصم بنفسجي يمينًا.
+   إن رغبت بعكس الجهتين (أنا يمينًا / الخصم يسارًا) انسخ الكود التالي
+   إلى نهاية الملف وأزل التعليق عنه:
+
+   #view-game .duel-row { flex-direction: row; }
+   #view-game .duel-bar .vb-fill.me  { left: auto; right: 2.5px;
+     background: linear-gradient(270deg, #0563cf 0%, #18b4f8 55%, #46d6ff 82%, #a5f3ff 100%); }
+   #view-game .duel-bar .vb-fill.opp { left: 2.5px; right: auto;
+     background: linear-gradient(90deg, #7c0ce0 0%, #b41ff5 55%, #e04dff 82%, #ff9df4 100%); }
+   #view-game .ds-chip.me  { flex-direction: row; }
+   #view-game .ds-chip.opp { flex-direction: row-reverse; }
+   ============================================================ */
+
+
+/* إصلاح ظهور صورة اللاعب كاملة ومنع تداخلها مع زر الانسحاب وشارة الجولة */
+#view-game img.ds-av {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 50%;
+}
+@media (max-height: 700px) {
+  #view-game .duel-wrap {
+    padding-top: 58px;
+  }
+  #view-game .ds-av {
+    margin-top: -4px;
+  }
+}
+
+
+/* ضبط موضع صور اللاعبين حتى لا تغطيها شارة الجولة أو زر الانسحاب */
+#view-game img.ds-av {
+  width: 72px !important;
+  height: 72px !important;
+  margin-top: 0 !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  border-radius: 50% !important;
+  overflow: hidden;
+  flex: 0 0 72px !important;
+}
+
+
+
+/* =========================================================
+   MODERN ARENA REDESIGN — واجهة حديثة متناسقة ومتجاوبة
+   ========================================================= */
+#view-game .arena-stage {
+  --ui-bg: #080d1b;
+  --ui-panel: rgba(15, 25, 48, .94);
+  --ui-line: rgba(148, 180, 255, .22);
+  --ui-text: #f4f7ff;
+  --ui-muted: #aab8d4;
+  background:
+    radial-gradient(90% 55% at 50% 0%, rgba(54, 102, 210, .28), transparent 72%),
+    radial-gradient(70% 45% at 100% 100%, rgba(126, 55, 210, .17), transparent 70%),
+    linear-gradient(160deg, #0b1428 0%, #080d1b 58%, #101329 100%);
+  border-radius: 18px;
+  isolation: isolate;
+}
+#view-game .arena-backdrop { opacity: .38; }
+#view-game .arena-grid { opacity: .16; }
+#view-game .duel-wrap {
+  justify-content: flex-start;
+  gap: clamp(8px, 1.3vh, 13px);
+  padding: clamp(48px, 6vh, 62px) clamp(10px, 3vw, 22px) clamp(70px, 9vh, 88px);
+}
+#view-game .duel-row {
+  width: 100%;
+  gap: 9px;
+  align-items: stretch;
+  margin-top: 3px;
+}
+#view-game .duel-side {
+  min-height: 142px;
+  padding: 12px 8px 10px;
+  gap: 7px;
+  align-items: center;
+  justify-content: flex-start;
+  border: 1px solid var(--ui-line);
+  border-radius: 20px;
+  background: linear-gradient(155deg, rgba(20, 37, 69, .96), rgba(10, 18, 37, .96));
+  box-shadow: 0 10px 26px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.07);
+  overflow: hidden;
+}
+#view-game .duel-side.me {
+  border-color: rgba(64, 176, 255, .42);
+  background: linear-gradient(155deg, rgba(17, 54, 91, .95), rgba(10, 22, 44, .98));
+}
+#view-game .duel-side.opp {
+  border-color: rgba(190, 105, 255, .40);
+  background: linear-gradient(155deg, rgba(65, 30, 91, .94), rgba(24, 15, 45, .98));
+}
+#view-game .duel-side .ds-frame { display: none; }
+#view-game .ds-av {
+  width: 58px !important;
+  height: 58px !important;
+  flex: 0 0 58px !important;
+  margin: 0 !important;
+  border: 2px solid rgba(111, 205, 255, .95);
+  border-radius: 50% !important;
+  background: #101d38;
+  object-fit: contain !important;
+  object-position: center !important;
+  padding: 3px;
+  box-shadow: 0 0 0 4px rgba(71, 159, 255, .10), 0 5px 14px rgba(0,0,0,.35);
+}
+#view-game .duel-side.opp .ds-av {
+  border-color: rgba(218, 137, 255, .95);
+  box-shadow: 0 0 0 4px rgba(190, 105, 255, .10), 0 5px 14px rgba(0,0,0,.35);
+}
+#view-game .ds-av img { object-fit: contain !important; }
+#view-game .ds-meta { padding-top: 0; gap: 3px; }
+#view-game .ds-name {
+  color: var(--ui-text);
+  font-size: clamp(10px, 1.5vh, 12px);
+  font-weight: 800;
+}
+#view-game .ds-lvl {
+  color: #c9d9ff;
+  border: 1px solid rgba(160,190,255,.22);
+  background: rgba(255,255,255,.07);
+  border-radius: 999px;
+}
+#view-game .ds-score {
+  min-width: 66px;
+  padding: 3px 12px;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 11px;
+  background: rgba(4, 10, 24, .62);
+  color: #fff;
+  font-size: 23px;
+  line-height: 1.2;
+  text-shadow: none;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,.28);
+}
+#view-game .ds-career-wins {
+  border-radius: 999px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.10);
+}
+#view-game .duel-vs {
+  align-self: center;
+  z-index: 2;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  border: 1px solid rgba(255,255,255,.20);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #263b66, #121c36);
+  color: #dce9ff;
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 4px 14px rgba(0,0,0,.35);
+}
+#view-game .duel-bar {
+  width: 100%;
+  height: 13px;
+  border: 1px solid rgba(255,255,255,.17);
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  box-shadow: inset 0 2px 5px rgba(0,0,0,.35);
+}
+#view-game #q-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: var(--ui-muted);
+}
+#view-game .qm-round,
+#view-game #q-meta .qm-chip {
+  border: 1px solid rgba(142,177,255,.22);
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: rgba(22, 37, 67, .82);
+  color: #dce8ff;
+  font-size: 10px;
+  font-weight: 800;
+}
+#view-game #q-timer {
+  min-width: 104px;
+  border: 1px solid rgba(103, 173, 255, .38);
+  border-radius: 14px;
+  background: linear-gradient(145deg, #172d50, #101a32);
+  color: #e9f4ff;
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+}
+#view-game #q-text {
+  border: 1px solid rgba(139, 174, 255, .34);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(22, 43, 82, .98), rgba(13, 27, 58, .98));
+  color: #f7f9ff;
+  box-shadow: 0 10px 24px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.09);
+  text-shadow: none;
+}
+#view-game .option {
+  min-height: 54px;
+  border: 1px solid rgba(116, 167, 255, .42);
+  border-radius: 15px;
+  padding: 9px 14px;
+  background: linear-gradient(145deg, #1b3d78, #122b5d);
+  color: #f4f7ff;
+  box-shadow: 0 5px 13px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.12);
+  font-weight: 800;
+}
+#view-game .option::after { display: none; }
+#view-game .option:active { transform: scale(.985); }
+#view-game .game-3d > .exit-btn {
+  top: 9px;
+  left: 9px;
+  right: auto;
+  inset-inline-start: 9px;
+  inset-inline-end: auto;
+  border: 1px solid rgba(255,120,135,.45);
+  border-radius: 999px;
+  background: linear-gradient(145deg, #a92c46, #751b36);
+  box-shadow: 0 5px 14px rgba(0,0,0,.25);
+  padding: 5px 12px;
+  font-size: 11px;
+}
+@media (max-height: 720px) {
+  #view-game .duel-wrap {
+    gap: 6px;
+    padding-top: 44px;
+    padding-bottom: 58px;
+  }
+  #view-game .duel-side { min-height: 120px; padding: 8px 6px; }
+  #view-game .ds-av { width: 48px !important; height: 48px !important; flex-basis: 48px !important; }
+  #view-game .ds-score { font-size: 20px; }
+}
+@media (max-width: 360px) {
+  #view-game .duel-row { gap: 5px; }
+  #view-game .duel-side { min-height: 112px; }
+  #view-game .ds-av { width: 44px !important; height: 44px !important; flex-basis: 44px !important; }
+  #view-game .duel-vs { width: 28px; height: 28px; flex-basis: 28px; font-size: 10px; }
+}
+
+/* ═══════════════ v23 — أدوات ثابتة، فرق متجاوبة، واجهة أكثر إحكامًا ═══════════════ */
+#view-game .game-layout-v2 { height: 100%; min-height: 0; overflow: hidden; }
+#view-game .game-3d {
+  flex: 0 0 auto;
+  height: clamp(170px, 33vh, 330px);
+  min-height: 0;
+  overflow: hidden;
+}
+#view-game .duel-wrap {
+  inset: 0;
+  gap: clamp(5px, .9vh, 10px);
+  padding: 42px clamp(5px, 2vw, 16px) 54px;
+  justify-content: center;
+}
+#view-game .duel-row {
+  width: 100%;
+  max-width: 900px;
+  min-width: 0;
+  gap: clamp(3px, 1vw, 9px);
+  align-items: stretch;
+}
+#view-game .duel-side {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(5px, 1vh, 10px) clamp(3px, .8vw, 8px);
+  gap: 4px;
+  overflow: hidden;
+}
+#view-game .duel-vs { flex: 0 0 clamp(27px, 6vw, 46px); width: clamp(27px, 6vw, 46px); font-size: clamp(17px, 3vh, 27px); }
+#view-game .ds-chips {
+  width: 100%; min-width: 0; min-height: 0; margin: 0;
+  display: flex; flex-wrap: nowrap; align-items: center; justify-content: center;
+  gap: 3px;
+}
+#view-game .ds-chip { flex: 1 1 0; min-width: 0; max-width: 100%; gap: 3px; padding: 0 2px; align-items: center; }
+#view-game .ds-av { width: clamp(30px, 5.5vh, 48px) !important; height: clamp(30px, 5.5vh, 48px) !important; flex-basis: clamp(30px, 5.5vh, 48px) !important; padding: 2px; }
+#view-game .ds-meta { min-width: 0; max-width: 100%; overflow: hidden; gap: 1px; }
+#view-game .ds-name { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: clamp(8px, 1.35vh, 11px); }
+#view-game .ds-lvl { font-size: clamp(7px, 1.05vh, 9px); padding: 0 4px; white-space: nowrap; }
+#view-game .ds-score { width: min(100%, 100px); min-width: 0; margin: 2px auto; padding: 1px 5px; font-size: clamp(18px, 3vh, 26px); }
+#view-game .ds-career-wins { max-width: 100%; padding: 2px 5px; gap: 3px; }
+#view-game .ds-career-wins .dw-c span { font-size: clamp(7px, 1.1vh, 9px); }
+#view-game .ds-career-wins .dw-c b { font-size: clamp(9px, 1.4vh, 12px); }
+#view-game .duel-row.duo .ds-chips,
+#view-game .duel-row.squad .ds-chips {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(0, 1fr); align-content: center; justify-items: stretch;
+  width: 100%; gap: 2px 3px;
+}
+#view-game .duel-row.duo .ds-chip,
+#view-game .duel-row.squad .ds-chip { width: 100%; max-width: 100%; min-width: 0; flex: none; }
+#view-game .duel-row.duo .ds-av { width: clamp(27px, 4.6vh, 40px) !important; height: clamp(27px, 4.6vh, 40px) !important; flex-basis: clamp(27px, 4.6vh, 40px) !important; }
+#view-game .duel-row.squad .ds-av { width: clamp(22px, 3.6vh, 32px) !important; height: clamp(22px, 3.6vh, 32px) !important; flex-basis: clamp(22px, 3.6vh, 32px) !important; }
+#view-game .duel-row.squad .ds-name { font-size: clamp(7px, 1.05vh, 9px); }
+#view-game .duel-row.squad .ds-lvl { display: none; }
+
+/* الأدوات: جميعها ظاهرة دائمًا، والتمرير أفقي فقط */
+#view-game .quiz-topbar { width: 100%; min-width: 0; flex: 0 0 auto; }
+#view-game .q-tools {
+  display: flex !important; flex-wrap: nowrap !important; justify-content: flex-start;
+  width: 100%; min-width: 0; gap: 7px; overflow-x: auto !important; overflow-y: hidden !important;
+  padding: 5px 4px 8px; direction: rtl; touch-action: pan-x; overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch; scrollbar-width: thin;
+}
+#view-game .q-tools:empty { display: flex !important; }
+#view-game .q-tool {
+  flex: 0 0 clamp(70px, 18vw, 90px) !important; width: clamp(70px, 18vw, 90px);
+  min-width: 0; min-height: 58px; height: 62px; padding: 5px 4px;
+  border-radius: 13px; gap: 2px; scroll-snap-align: start;
+}
+#view-game .q-tool.is-empty {
+  opacity: .28; filter: grayscale(.72) saturate(.45); box-shadow: none;
+  border-color: rgba(180, 200, 230, .22); cursor: not-allowed;
+}
+#view-game .q-tool.is-empty::after { opacity: .2; }
+#view-game .qt-ico { height: 22px; }
+#view-game .qt-ico .ico, #view-game .qt-ico svg { width: 20px; height: 20px; }
+#view-game .qt-fifty { font-size: 16px; font-weight: 1000; letter-spacing: -1px; color: #ffe58a; text-shadow: 0 0 8px rgba(255,210,70,.5); }
+#view-game .qt-label { font-size: 9px; line-height: 1.12; }
+#view-game .qt-label small { font-size: 8px; }
+#view-game .qt-count { top: -4px; inset-inline-end: -3px; min-width: 17px; height: 17px; font-size: 9px; }
+#view-game .game-quiz-v2 { flex: 1 1 0; min-height: 0; overflow: hidden; gap: clamp(5px, .8vh, 8px); padding: 5px clamp(8px, 2vw, 16px) max(6px, env(safe-area-inset-bottom)); }
+#view-game .q-meta { flex: 0 0 auto; min-height: 22px; gap: 5px; }
+#view-game .qm-chip { font-size: clamp(9px, 1.3vh, 11px); padding: 2px 7px; }
+#view-game .question-text { min-height: clamp(54px, 9vh, 88px); max-height: 3.3em; padding: 7px 10px; font-size: clamp(17px, 3vh, 25px); line-height: 1.25; }
+#view-game .options { flex: 1 1 0; min-height: 0; grid-template-rows: repeat(2, minmax(0, 1fr)); gap: clamp(5px, 1vh, 9px); }
+#view-game .option { min-height: 0; padding: 5px clamp(32px, 7vw, 46px); border-width: 2px; border-radius: 14px; }
+#view-game .opt-letter { width: clamp(25px, 4.2vh, 34px); height: clamp(25px, 4.2vh, 34px); font-size: clamp(12px, 1.8vh, 16px); inset-inline-start: 6px; }
+#view-game .opt-text { font-size: clamp(13px, 2.1vh, 18px); line-height: 1.25; }
+#view-game .option.option-removed { display: none !important; }
+
+/* لوحة إعلان الجولة: اسم المجيب + مجموع انتصارات الفريقين */
+#break-overlay .break-card { gap: 10px; padding: clamp(12px, 2vh, 20px); border-radius: 20px; }
+#break-overlay .break-answerer {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  padding: 8px 12px; border: 1px solid rgba(255, 210, 85, .38); border-radius: 13px;
+  background: linear-gradient(135deg, rgba(255,190,45,.13), rgba(25,45,90,.45));
+}
+#break-overlay .break-answerer span { color: #ffe08a; font-size: 10px; font-weight: 800; }
+#break-overlay .break-answerer b { color: #fff; font-size: clamp(15px, 2.3vh, 20px); }
+#break-overlay .break-scoreboard { width: 100%; display: grid; grid-template-columns: auto 1fr auto 1fr auto; align-items: center; gap: 5px; padding: 8px 10px; border-radius: 14px; background: rgba(5,12,30,.58); }
+#break-overlay .score-num { font-size: clamp(25px, 4vh, 34px); }
+#break-overlay .score-label { font-size: clamp(9px, 1.4vh, 12px); text-align: center; white-space: nowrap; }
+#break-overlay .break-player { min-width: 0; overflow-wrap: anywhere; }
+
+@media (max-height: 700px) {
+  #view-game .game-3d { height: clamp(145px, 29vh, 220px); }
+  #view-game .duel-wrap { padding-top: 36px; padding-bottom: 42px; gap: 3px; }
+  #view-game .duel-side { padding: 3px; }
+  #view-game .ds-score { font-size: 18px; }
+  #view-game .q-tool { height: 54px; min-height: 52px; }
+  #view-game .game-quiz-v2 { gap: 4px; }
+  #view-game .question-text { min-height: 48px; font-size: clamp(15px, 2.6vh, 20px); }
+  #view-game .option { min-height: 0; }
+}
+@media (max-width: 380px) {
+  #view-game .game-3d { height: clamp(150px, 30vh, 235px); }
+  #view-game .duel-vs { flex-basis: 24px; width: 24px; font-size: 14px; }
+  #view-game .duel-side { border-radius: 13px; }
+  #view-game .duel-row.squad .ds-av { width: 20px !important; height: 20px !important; flex-basis: 20px !important; }
+  #view-game .duel-row.squad .ds-name { font-size: 7px; }
+  #view-game .q-tool { flex-basis: 68px !important; width: 68px; }
+  #view-game .qt-label { font-size: 8px; }
+  #view-game .question-text { font-size: 16px; }
+  #view-game .opt-text { font-size: 12px; }
+}
+
+#view-game .options.has-two-options { grid-template-rows: minmax(0, 1fr); grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#break-overlay .intro-rules { display: grid; grid-template-columns: 1fr; gap: 6px; margin: 0; padding: 0; list-style: none; }
+#break-overlay .intro-rules li { padding: 6px 9px; border: 1px solid rgba(130,160,230,.15); border-radius: 10px; background: rgba(15,27,55,.48); color: #e5edff; font-size: clamp(10px, 1.65vh, 13px); line-height: 1.45; }
+#break-overlay .intro-rules b { color: #ffe08a; }
+#break-overlay.intro-fullscreen .break-card.intro { min-height: 0; max-height: 100%; overflow-y: auto; gap: clamp(7px, 1.2vh, 12px); }
+#break-overlay .break-results { min-width: 0; gap: 6px; }
+#break-overlay .break-vs { flex: 0 0 26px; text-align: center; }
+@media (max-height: 650px) {
+  #break-overlay .intro-rules { gap: 4px; }
+  #break-overlay .intro-rules li { padding: 4px 7px; font-size: 10px; line-height: 1.35; }
+  #break-overlay .break-card { gap: 7px; padding: 10px; }
+}
