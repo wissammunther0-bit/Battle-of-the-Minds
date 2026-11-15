@@ -1,0 +1,222 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================================
+    // 🛡️ v31 — قواعد «معركة العقول» الصارمة
+    //  أبرز ما هو جديد في v31:
+    //   1) gameMeta انقسم: الخزان وسجلات الأيام تُكتب من أجهزة
+    //      اللاعبين (زيادات ذرّية)، وكل وثيقة أخرى (النصوص القانونية
+    //      legal · علامة factoryReset …) كتابتها للأدمن فقط —
+    //      إغلاق باب العبث بالنصوص القانونية أو علامة الاستعادة.
+    //   2) كتابة اللاعب على ملفه صارت مقيدة بحدود عقلانية (sanity):
+    //      لا يمكن لأحد أن يضع جواهر أو علامات أو انتصارات بأرقام
+    //      ضخمة مستحيلة — أي تعديل فوق الحد يُرفض كله.
+    //   3) حقول الإدارة (banned/frozenUntil/susReviewedAt/role)
+    //      لا يكتبها اللاعب على نفسه — للأدمن فقط.
+    // ============================================================
+
+    // 🛡️ هل صاحب الطلب أدمن؟ (وثيقة admins/{uid} موجودة)
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // 🚩 حقول الإدارة — يمنع اللاعب من كتابتها على ملفه
+    function adminOnlyField() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasAny(['banned', 'frozenUntil', 'frozenReason', 'susReviewedAt', 'role', 'isAdmin']);
+    }
+
+    // 🧮 حدود عقلانية للأرصدة (ضد التعديل الجماعي الوحشي):
+    //    أي قيمة رقمية فوق الحد — أو قيمة غير رقمية — ترفض الكتابة كلها
+    function economySane() {
+      return request.resource.data.get('tokens', 0) is number && request.resource.data.get('tokens', 0) <= 999999
+        && request.resource.data.get('gems', 0) is number && request.resource.data.get('gems', 0) <= 999999
+        && request.resource.data.get('intel', 0) is number && request.resource.data.get('intel', 0) <= 99999
+        && request.resource.data.get('wins', 0) is number && request.resource.data.get('wins', 0) <= 100000
+        && request.resource.data.get('losses', 0) is number && request.resource.data.get('losses', 0) <= 100000
+        && request.resource.data.get('roundsPlayed', 0) is number && request.resource.data.get('roundsPlayed', 0) <= 100000
+        && request.resource.data.get('correctAnswers', 0) is number && request.resource.data.get('correctAnswers', 0) <= 500000
+        && request.resource.data.get('wrongAnswers', 0) is number && request.resource.data.get('wrongAnswers', 0) <= 500000
+        && request.resource.data.get('totalAnswered', 0) is number && request.resource.data.get('totalAnswered', 0) <= 500000
+        && request.resource.data.get('fastAnswers', 0) is number && request.resource.data.get('fastAnswers', 0) <= 500000
+        && request.resource.data.get('answerMsSum', 0) is number && request.resource.data.get('answerMsSum', 0) <= 50000000000;
+    }
+
+    // 👤 اللاعبون: قراءة عامة (بحث/ملفات/متصدرين)
+    //    الكتابة: صاحب الملف (بحدود عقلانية وبلا حقول إدارة) أو الأدمن
+    match /players/{uid} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && !adminOnlyField()
+        && economySane()
+        || request.auth != null && isAdmin();
+      allow delete: if request.auth != null
+        && (request.auth.uid == uid || isAdmin());
+
+      // 👥 قائمة أصدقاء اللاعب — تحتاج كتابة من الطرفين عند القبول/الإزالة
+      match /friends/{fid} {
+        allow read, write: if request.auth != null;
+      }
+
+      // 📜 سجل جولات اللاعب — صاحبه + الأدمن (مراجعة ملف اللاعب)
+      match /history/{hid} {
+        allow read: if request.auth != null
+          && (request.auth.uid == uid || isAdmin());
+        allow create, update: if request.auth != null && request.auth.uid == uid;
+        allow delete: if request.auth != null
+          && (request.auth.uid == uid || isAdmin());
+      }
+    }
+
+    // 🚫 الحجر الأمني (tombstone) للاعبين المحظورين/المحذوفين
+    //    القراءة لصاحب الحجر فقط + الأدمن — الكتابة للأدمن فقط
+    match /banned/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ✉️ طلبات الصداقة — المشاركون فقط (قواعد مفتوحة للمصادقين كما كانت)
+    match /friendRequests/{id} {
+      allow read, write: if request.auth != null;
+    }
+
+    // ⚔️ وثائق الجولات والغرف ووقت السيرفر — أي مستخدم مسجل
+    match /gameStates/{id}  { allow read, write: if request.auth != null; }
+    match /matchmaking/{id} { allow read, write: if request.auth != null; }
+    match /rooms/{id}       { allow read, write: if request.auth != null; }
+    match /serverTime/{id}  { allow read, write: if request.auth != null; }
+
+    // 🛠️ تذاكر الدعم الفني:
+    //    اللاعب ينشئ تذكرته ويقرأها ويعدّلها (لقراءة الردود/الوسم)
+    //    الأدمن يقرأ الكل ويرد
+    match /supportTickets/{id} {
+      allow read: if request.auth != null
+        && (resource.data.uid == request.auth.uid || isAdmin());
+      // v24: الدعم الفني يبدأ محادثة مع أي لاعب (admin_{uid})
+      allow create: if request.auth != null
+        && (request.resource.data.uid == request.auth.uid || isAdmin());
+      allow update, delete: if request.auth != null
+        && (resource.data.uid == request.auth.uid || isAdmin());
+    }
+
+    // ❓ أسئلة اللعبة: قراءة لكل المصادقين، كتابة للأدمن فقط
+    match /questions/{id} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 🛒 عناصر المتجر: قراءة للجميع المصادقين، كتابة للأدمن —
+    //    v24: يُسمح للاعب المصادق بتحديث عدّاد إحصائية الشراء فقط
+    //    (stats.buys / stats.amount / statsCur / updatedAt)
+    function statsOnlyChanged() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['stats', 'statsCur', 'updatedAt']);
+    }
+    match /storeItems/{id} {
+      allow read: if request.auth != null;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin()
+        || (request.auth != null && statsOnlyChanged());
+    }
+
+    // 🛒 storeMeta — إعدادات المتجر + ⚙️ v31 إعدادات الإعلانات (ads):
+    //    قراءة لكل المصادقين (اللعبة تقرأ storeMeta/ads لحظيًا)،
+    //    الكتابة للأدمن فقط
+    match /storeMeta/{id} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // 🌍 تجاوزات الترجمة: قراءة عامة، كتابة أدمن
+    match /translations/{lang} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // 🎨 تجاوزات الأيقونات (v27): كل أيقونة/شخصية افتراضية يغيّرها
+    //    الأدمن من قسم «التحكم في الأيقونات» — قراءة لكل المصادقين
+    //    (اللعبة تطبّقها لحظيًا)، والكتابة للأدمن فقط
+    match /iconOverrides/{key} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // 🌐 ترجمات الأسئلة المشتركة (v12): يقرأها ويكتبها أي لاعب مصادق —
+    //    أول لاعب يترجم السؤال يخزّنه فيستفيد منه الجميع بلا استدعاءات خارجية
+    match /qtrans/{id} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null;
+    }
+
+    // 🧠 جوائز الذكاء (v11): قراءة للجميع المصادقين، كتابة أدمن —
+    //    v24: يُسمح للاعب بتحديث عدّاد الاستلام (claims) فقط
+    function claimsOnlyChanged() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['claims', 'updatedAt']);
+    }
+    match /awards/{id} {
+      allow read: if request.auth != null;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin()
+        || (request.auth != null && claimsOnlyChanged());
+    }
+
+    // 📨 طلبات التبادل (v11): اللاعب ينشئ طلبه ويقرأه —
+    //    الأدمن يقرأ الكل ويحدّث الحالة (تم التسليم/مرفوض)
+    match /awardClaims/{id} {
+      allow read: if request.auth != null
+        && (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // 🛡️ قائمة الأدمن: القراءة لصاحب الوثيقة فقط، بلا كتابة من العميل
+    //    (تُدار يدوياً من Firebase Console)
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // 🤖 اللاعبون الافتراضيون (v23): قراءة لكل المصادقين (الملفات
+    //    والمتصدرين والمطابقة)، الكتابة للأدمن فقط — وسجل جولاتهم
+    //    الفرعي يكتبه جهاز المضيف عند نهاية الجولة (تسجيل نتائجهم)
+    match /virtualPlayers/{vpid} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if isAdmin();
+      match /history/{hid} {
+        allow read: if request.auth != null;
+        allow create, update, delete: if request.auth != null || isAdmin();
+      }
+    }
+
+    // 🏦 gameMeta — v31 مقسمة بدقة:
+    //    · tank        : الخزان الرئيسي — زيادات ذرّية من كل الأجهزة
+    //    · ecoLog/adsLog (سجلات الأيام): زيادات رخيصة من كل الأجهزة
+    //    · باقي الوثائق (legal · factoryReset …): قراءة للجميع،
+    //      والكتابة للأدمن فقط — إغلاق باب العبث بالنصوص القانونية
+    //      وعلامة الاستعادة
+    match /gameMeta/tank {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null;
+      allow delete: if isAdmin();
+
+      match /days/{docId} {
+        allow read, create, update: if request.auth != null;
+        allow delete: if isAdmin();
+      }
+    }
+    match /gameMeta/{id} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if isAdmin();
+    }
+    match /gameMeta/{log}/days/{docId} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null;
+      allow delete: if isAdmin();
+    }
+  }
+}
