@@ -1,0 +1,380 @@
+/* ==========================================================
+   social.css — أنماط v4: السجل، المتصدرون، بطاقة اللاعب،
+   شاشة النهاية، شاشة الشرح، تحسينات الأصدقاء
+   ========================================================== */
+
+/* ---------- حاوية صفحات كاملة (السجل/المتصلدون) ---------- */
+.page-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px 90px;
+}
+
+/* ---------- 📜 سجل الجولات ---------- */
+.hist-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  border-radius: 14px;
+  background: rgba(20, 25, 45, 0.7);
+  border: 1px solid rgba(147, 51, 234, 0.22);
+}
+.hist-row.win { border-color: rgba(34, 197, 94, 0.45); }
+.hist-row.loss { border-color: rgba(239, 68, 68, 0.35); }
+
+.hist-result {
+  font-weight: 900;
+  font-size: 13px;
+  min-width: 86px;
+  white-space: nowrap;
+}
+.hist-row.win .hist-result { color: #22c55e; }
+.hist-row.loss .hist-result { color: #ef4444; }
+
+.hist-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted, #8fa3c8);
+  border: 1px solid rgba(143, 163, 200, 0.35);
+  border-radius: 8px;
+  padding: 1px 6px;
+}
+
+.hist-opp {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.hist-name {
+  background: none;
+  border: none;
+  color: var(--text, #fff);
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hist-name:disabled { cursor: default; color: var(--muted, #8fa3c8); }
+.hist-name:not(:disabled):hover { color: var(--primary, #a855f7); }
+.hist-score { font-weight: 800; color: var(--muted, #8fa3c8); font-size: 13px; }
+.hist-date { font-size: 11px; color: var(--muted, #8fa3c8); white-space: nowrap; }
+
+/* ---------- 🏆 المتصلدون ---------- */
+.lb-mychip {
+  font-size: 12px;
+  font-weight: 800;
+  color: #22c55e;
+  white-space: nowrap;
+}
+
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  margin-bottom: 8px;
+  border-radius: 14px;
+  background: rgba(20, 25, 45, 0.7);
+  border: 1px solid rgba(147, 51, 234, 0.22);
+}
+.lb-row.me {
+  border-color: rgba(34, 197, 94, 0.6);
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.18);
+}
+.lb-rank {
+  min-width: 42px;
+  text-align: center;
+  font-weight: 900;
+  font-size: 15px;
+  color: var(--muted, #8fa3c8);
+}
+.lb-name {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text, #fff);
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 2px 4px;
+}
+.lb-name:hover { color: var(--primary, #a855f7); }
+.lb-level {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--primary, #a855f7);
+  white-space: nowrap;
+}
+.lb-wins {
+  font-size: 12px;
+  color: var(--muted, #8fa3c8);
+  white-space: nowrap;
+  min-width: 62px;
+  text-align: end;
+}
+
+/* ---------- 👤 بطاقة الملف الشخصي ---------- */
+.pcard { padding: 6px 2px; }
+.pcard-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.pcard-avatar {
+  font-size: 40px;
+  width: 68px;
+  height: 68px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(147, 51, 234, 0.18);
+  border: 1px solid rgba(147, 51, 234, 0.4);
+}
+.pcard-name { font-size: 20px; font-weight: 900; }
+.pcard-lvl { font-size: 13px; color: var(--primary, #a855f7); font-weight: 800; margin-top: 2px; }
+
+.pcard-progress, .end-progress {
+  position: relative;
+  height: 22px;
+  border-radius: 12px;
+  background: rgba(10, 14, 28, 0.8);
+  border: 1px solid rgba(147, 51, 234, 0.3);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.pcard-progress-fill, .end-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7c3aed, #3b82f6);
+  border-radius: 12px;
+  transition: width .6s ease;
+}
+.pcard-progress span, .end-progress-txt {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,.8);
+}
+
+.pcard-stats, .end-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.es {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 4px;
+  border-radius: 12px;
+  background: rgba(20, 25, 45, 0.75);
+  border: 1px solid rgba(147, 51, 234, 0.22);
+}
+.es b { font-size: 18px; }
+.es span { font-size: 10px; color: var(--muted, #8fa3c8); font-weight: 700; }
+
+.pcard-actions { margin-top: 4px; }
+.pcard-actions .btn { width: 100%; }
+
+/* ---------- 🏁 شاشة النهاية ---------- */
+.end-card {
+  text-align: center;
+  padding: 18px 14px;
+  max-width: 460px;
+  margin: 0 auto;
+}
+.end-title {
+  font-size: 28px;
+  margin-bottom: 14px;
+}
+.end-title.win {
+  color: #22c55e;
+  text-shadow: 0 0 22px rgba(34, 197, 94, 0.6);
+}
+.end-title.lose {
+  color: #ef4444;
+  text-shadow: 0 0 22px rgba(239, 68, 68, 0.5);
+}
+.end-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.end-side { display: flex; flex-direction: column; gap: 2px; }
+.end-num { font-size: 44px; font-weight: 900; line-height: 1; }
+.end-side.me .end-num { color: #22c55e; }
+.end-side.opp .end-num { color: #ef4444; }
+.end-lbl { font-size: 12px; color: var(--muted, #8fa3c8); font-weight: 800; }
+.end-dash { font-size: 30px; color: var(--muted, #8fa3c8); }
+.end-sub { font-size: 12px; color: var(--muted, #8fa3c8); margin-bottom: 14px; }
+
+.end-levelup {
+  margin: 0 auto 14px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  font-weight: 900;
+  color: #ffd166;
+  background: rgba(255, 209, 102, 0.1);
+  border: 1px solid rgba(255, 209, 102, 0.45);
+  text-shadow: 0 0 14px rgba(255, 209, 102, 0.5);
+  animation: endGlow 1.6s ease infinite alternate;
+}
+@keyframes endGlow {
+  from { box-shadow: 0 0 8px rgba(255, 209, 102, 0.15); }
+  to   { box-shadow: 0 0 22px rgba(255, 209, 102, 0.45); }
+}
+
+.end-progress { max-width: 340px; margin: 0 auto 16px; }
+
+.end-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+.end-actions .btn { max-width: 300px; width: 100%; }
+
+/* ---------- 📖 شاشة الشرح (قواعد اللعب) ---------- */
+.intro-rules {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+  text-align: start;
+}
+.intro-rules li {
+  font-size: 13px;
+  padding: 6px 8px;
+  margin-bottom: 5px;
+  border-radius: 10px;
+  background: rgba(20, 25, 45, 0.6);
+  border: 1px solid rgba(147, 51, 234, 0.18);
+  color: var(--text, #fff);
+  line-height: 1.5;
+}
+.intro-rules li b { color: var(--primary, #a855f7); }
+
+/* ---------- تحسينات الأصدقاء ---------- */
+.friend-item .info {
+  background: none;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 2px 4px;
+  text-align: start;
+}
+.friend-item .info:disabled { cursor: default; }
+.fr-lvl {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted, #8fa3c8);
+  white-space: nowrap;
+}
+.fr-badge {
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 8px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+.fr-badge.pending { color: #ffd166; background: rgba(255, 209, 102, 0.12); }
+.fr-badge.rejected { color: #ef4444; background: rgba(239, 68, 68, 0.12); }
+
+.waiting-hint {
+  font-size: 12px;
+  color: var(--muted, #8fa3c8);
+  text-align: center;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+/* ---------- 💀 هياكل التحميل (بدل "جاري التحميل...") ---------- */
+.sk-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 58px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  border-radius: 14px;
+  background: rgba(20, 25, 45, 0.55);
+  border: 1px solid rgba(147, 51, 234, 0.14);
+  overflow: hidden;
+}
+
+.sk-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.sk-avatar.big { width: 52px; height: 52px; }
+
+.sk-lines { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sk-line { height: 11px; border-radius: 6px; }
+.sk-line.short { height: 9px; }
+
+.sk-chip { width: 52px; height: 26px; border-radius: 999px; flex-shrink: 0; }
+
+.sk-card { padding: 4px 0; }
+
+.sk-row .sk-avatar,
+.sk-row .sk-line,
+.sk-row .sk-chip {
+  background: linear-gradient(
+    100deg,
+    rgba(45, 55, 90, 0.55) 35%,
+    rgba(90, 105, 155, 0.65) 50%,
+    rgba(45, 55, 90, 0.55) 65%
+  );
+  background-size: 200% 100%;
+  animation: skShimmer 1.3s linear infinite;
+}
+
+@keyframes skShimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* ---------- طلب وارد — تمييز خفيف ---------- */
+.friend-item.incoming {
+  border-color: rgba(34, 197, 94, 0.4);
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.1);
+}
+
+/* ---------- شاشات صغيرة ---------- */
+@media (max-width: 380px) {
+  .hist-date { display: none; }
+  .end-num { font-size: 36px; }
+  .es b { font-size: 15px; }
+  .dock { margin: 0 8px 8px; }
+  .dock-btn.fab { width: 60px; height: 60px; transform: translateY(-16px); }
+  .dock-btn.fab:hover { transform: translateY(-20px) scale(1.05); }
+}

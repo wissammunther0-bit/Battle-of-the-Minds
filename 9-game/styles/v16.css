@@ -1,0 +1,801 @@
+/* ============================================================
+   v16.css — الرئيسية الجديدة بالكامل وفق نموذج المستخدم المرفق
+   ------------------------------------------------------------
+   • خلفية كحلية عميقة بدل البنفسجية (فقط داخل #view-main)
+   • ترحيب + اسم يمينًا — إعدادات + جواهر + مصباح يسارًا
+   • أفاتار سداسي بإطار ذهبي سميك + توهج إهليلجي أسفله
+   • شريط مستوى (شارة صفراء + شريط فيروزي + كسر 20/100)
+   • زر "ابدأ المعركة" الذهبي الكبير
+   • 3 بطاقات: حقيبتي | إنشاء غرفة | المتجر
+   • لافتة صندوق المكافآت: أيقونة هدية + زر أحمر "افتح"
+   • صف متجر الجوائز: سلة + تقدم أصفر نحو أقرب جائزة
+   • شريط سفلي أيقوني بزوايا دائرية + زر الرئيسية الفيروزي
+   ============================================================ */
+
+/* -------------------------------------------------------------
+   00 📱 v17 — ارتفاع ديناميكي حقيقي لكل هواتف (شريط المتصفح المتحرك)
+   dvh يتبع الشريط العلوي/السفلي للمتصفح — لا قصّ ولا فراغ أسفل
+   ------------------------------------------------------------- */
+#app,
+.view {
+  height: 100vh;   /* احتياط للمتصفحات القديمة */
+  height: 100dvh;  /* الحديثة — ارتفاع الشاشة الفعلي المتغير */
+}
+
+/* -------------------------------------------------------------
+   00 📱 v17 — ارتفاع ديناميكي حقيقي لكل هواتف (شريط المتصفح المتحرك)
+   dvh يتبع الشريط العلوي/السفلي للمتصفح — لا قصّ ولا فراغ أسفل
+   ------------------------------------------------------------- */
+#app,
+.view {
+  height: 100vh;   /* احتياط للمتصفحات القديمة */
+  height: 100dvh;  /* الحديثة — ارتفاع الشاشة الفعلي المتغير */
+}
+
+/* ------------------------------------------------------------
+   00 🎨 خلفية الرئيسية الكحلية (بدل النيون البنفسجي)
+   ------------------------------------------------------------ */
+#view-main {
+  --hb-card: #131c38;
+  --hb-line: rgba(126, 150, 200, .16);
+  --hgold: #fbbf24;
+  --hgold-2: #f0b429;
+  --hteal: #2dd4bf;
+  --hred: #ef4444;
+  --hmut: #93a5c9;
+  background:
+    radial-gradient(130% 55% at 50% 0%, #182550 0%, rgba(24, 37, 80, 0) 62%),
+    linear-gradient(180deg, #0d1530 0%, #0a0f22 55%, #070b18 100%);
+  /* v17: لا فيض أفقي على أي شاشة — والعمود الأوسط هو من يتمرّر */
+  overflow: hidden;
+}
+
+/* لمسات زرقاء هادئة بدل البنفسجية في خلفية الجسيمات */
+#view-main .bg-effects {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(59, 130, 246, .10) 0%, transparent 42%),
+    radial-gradient(circle at 85% 82%, rgba(20, 184, 166, .08) 0%, transparent 45%),
+    radial-gradient(circle at 50% 42%, rgba(59, 130, 246, .05) 0%, transparent 60%);
+}
+
+/* ------------------------------------------------------------
+   01 🪪 الشريط العلوي
+   ------------------------------------------------------------ */
+/* --------------------------------------------------------
+   🪪 الشريط العلوي — يراعي النوتش والحواف الآمنة (v17)
+   -------------------------------------------------------- */
+.home-top {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 18px 8px;
+  flex-shrink: 0;
+}
+
+.ht-greet {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  font-family: inherit;
+  padding: 4px 2px;
+  text-align: start;
+  min-width: 0;
+}
+.ht-greet:active { opacity: .8; }
+
+.ht-hello {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--hmut);
+  letter-spacing: .2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.ht-name {
+  font-size: clamp(17px, 5.4vw, 21px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.2;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .45);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: clamp(110px, 40vw, 178px);
+}
+
+.ht-tools { display: flex; align-items: center; gap: clamp(6px, 2vw, 8px); flex-shrink: 0; min-width: 0; }
+
+.ht-round {
+  width: clamp(38px, 11vw, 42px);
+  height: clamp(38px, 11vw, 42px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 25, 50, .9);
+  border: 1px solid var(--hb-line);
+  color: #cdd9f2;
+  cursor: pointer;
+  transition: border-color .2s, transform .15s;
+  flex-shrink: 0;
+  padding: 0;
+}
+.ht-round:hover { border-color: rgba(126, 150, 200, .45); }
+.ht-round:active { transform: scale(.92); }
+.ht-round .ico { width: 20px; height: 20px; }
+
+.ht-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: clamp(38px, 11vw, 42px);
+  padding: 0 clamp(11px, 3.6vw, 15px);
+  border-radius: 999px;
+  background: rgba(15, 22, 46, .92);
+  border: 1px solid var(--hb-line);
+  font-size: clamp(13.5px, 4vw, 15px);
+  font-weight: 900;
+  min-width: 0;
+}
+.ht-pill .htp-ico { display: flex; }
+.ht-pill .htp-ico .ico { width: 17px; height: 17px; }
+.ht-pill.gold { color: var(--hgold); border-color: rgba(251, 191, 36, .28); }
+.ht-pill.teal { color: var(--hteal); border-color: rgba(45, 212, 191, .28); }
+.ht-pill.tokens { color: #fde68a; border-color: rgba(250, 204, 21, .4); }
+
+/* ------------------------------------------------------------
+   02 🛡️ الأفاتار السداسي الذهبي
+   ------------------------------------------------------------ */
+.home-scroll {
+  width: 100%;
+  padding: 0 18px;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;   /* v17: يسمح بالتمرير الداخلي داخل flex column */
+  /* v17: تمرير داخلي أنيق — الشريط العلوي والدوك ثابتان دائمًا */
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+}
+.home-scroll::-webkit-scrollbar { display: none; }
+
+/* --------------------------------------------------------
+   🛡️ الأفاتار السداسي — مقاسات مرنة تتبع عرض الشاشة (v17)
+   من 320px حتى التابلت بنفس التناسب دون فيض
+   -------------------------------------------------------- */
+.hero-hex {
+  position: relative;
+  width: clamp(148px, 47vw, 206px);
+  height: clamp(171px, 54vw, 238px);
+  margin: 4px auto 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: block;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.hex-border {
+  position: absolute;
+  inset: 0;
+  display: block;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: linear-gradient(180deg, #fcd968 0%, #f5b93c 46%, #d9950f 100%);
+  filter: drop-shadow(0 12px 30px rgba(245, 185, 60, .30));
+}
+
+.hex-inner {
+  position: absolute;
+  inset: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background:
+    radial-gradient(90% 70% at 50% 30%, #1a2a55 0%, #0c142e 70%),
+    linear-gradient(180deg, #101c3e 0%, #0a1228 100%);
+  font-size: clamp(56px, 20vw, 78px);
+  line-height: 1;
+}
+.hex-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+.hex-inner .ico { width: 70px; height: 70px; color: #7f8db0; }
+
+/* التوهج الإهليلجي أسفل السداسي */
+.hex-glow {
+  position: absolute;
+  left: 50%;
+  bottom: -20px;
+  transform: translateX(-50%);
+  width: 78%;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center,
+    rgba(250, 204, 21, .42) 0%,
+    rgba(250, 204, 21, .10) 55%,
+    transparent 75%);
+  filter: blur(7px);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------
+   03 📈 شريط المستوى
+   ------------------------------------------------------------ */
+.lvl-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 400px;
+  margin: 18px auto 0;
+  padding: 0 2px;
+}
+
+.lvl-pill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(160deg, #fcd34d, #f0b429);
+  color: #1c2440;
+  font-size: 13.5px;
+  font-weight: 900;
+  padding: 7px 16px;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(240, 180, 41, .35);
+  border: 0;
+  font-family: inherit;
+  cursor: pointer;
+  transition: filter .2s, transform .15s, box-shadow .2s;
+}
+.lvl-pill:hover { filter: brightness(1.06); box-shadow: 0 5px 18px rgba(240, 180, 41, .45); }
+.lvl-pill:active { transform: scale(.97); }
+.lvl-pill:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.lvl-pill b { font-weight: 900; }
+
+.lvl-bar {
+  flex: 1;
+  height: 7px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, .10);
+  overflow: hidden;
+}
+.lvl-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #14b8a6, #2dd4bf);
+  box-shadow: 0 0 10px rgba(45, 212, 191, .55);
+  transition: width .5s ease;
+}
+
+.lvl-frac {
+  flex-shrink: 0;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--hmut);
+}
+
+/* ------------------------------------------------------------
+   04 ⚔️ زر المعركة الذهبي الكبير
+   ------------------------------------------------------------ */
+/* --------------------------------------------------------
+   ⚔️ زر المعركة — خط مرن يبقى سطرًا واحدًا على أصغر شاشة
+   -------------------------------------------------------- */
+.battle-btn {
+  width: 100%;
+  max-width: 440px;
+  min-height: 64px;
+  margin: 16px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: clamp(17px, 4.5vw, 20px) 24px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: clamp(19px, 5.6vw, 23px);
+  font-weight: 900;
+  color: #16213f;
+  white-space: nowrap;
+  background: linear-gradient(180deg, #fcd860 0%, #f7c437 52%, #eda90e 100%);
+  box-shadow:
+    0 12px 32px rgba(240, 178, 40, .42),
+    inset 0 1px 0 rgba(255, 255, 255, .55);
+  transition: transform .15s, box-shadow .25s, filter .2s;
+  position: relative;
+  overflow: hidden;
+}
+.battle-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 25%, rgba(255, 255, 255, .35) 50%, transparent 72%);
+  transform: translateX(130%);
+  transition: transform .7s ease;
+  pointer-events: none;
+}
+.battle-btn:hover::after { transform: translateX(-130%); }
+.battle-btn:hover { filter: brightness(1.05); }
+.battle-btn:active { transform: scale(.97); }
+.battle-btn:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+.battle-btn .bt-ico { display: flex; }
+.battle-btn .bt-ico .ico { width: 28px; height: 28px; }
+
+/* ------------------------------------------------------------
+   05 🗂️ البطاقات الثلاث
+   ------------------------------------------------------------ */
+.quick3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 11px;
+  width: 100%;
+  max-width: 400px;
+  margin: 13px auto 0;
+}
+
+.q-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 6px 11px;
+  border-radius: 17px;
+  background: linear-gradient(180deg, #18224a 0%, #101832 100%);
+  border: 1px solid rgba(126, 150, 200, .17);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, .28),
+    inset 0 1px 0 rgba(255, 255, 255, .05);
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform .15s, border-color .2s, box-shadow .2s;
+}
+.q-card:hover { transform: translateY(-2px); }
+.q-card:active { transform: scale(.95); }
+.q-card .qc-ico { display: flex; }
+.q-card .qc-ico .ico { width: clamp(23px, 7vw, 27px); height: clamp(23px, 7vw, 27px); }
+.q-card .qc-label { font-size: clamp(11px, 3.6vw, 13.5px); font-weight: 800; color: #f2f6ff; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.q-card.teal { border-color: rgba(45, 212, 191, .24); }
+.q-card.teal .qc-ico { color: var(--hteal); }
+.q-card.yellow { border-color: rgba(251, 191, 36, .24); }
+.q-card.yellow .qc-ico { color: var(--hgold); }
+.q-card.red { border-color: rgba(248, 113, 113, .24); }
+.q-card.red .qc-ico { color: #f87171; }
+
+/* ------------------------------------------------------------
+   06 🎁 لافتة صندوق المكافآت — هدية ذهبية + زر أحمر "افتح"
+       (العدّاد يظهر داخل اللافتة مكان الزر حين لا تكون جاهزة)
+   ------------------------------------------------------------ */
+.box-mount {
+  width: 100%;
+  max-width: 400px;
+  margin: 12px auto 0;
+}
+
+.rbx-btn {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 17px;
+  background: linear-gradient(180deg, #131c3a 0%, #0d1428 100%);
+  border: 1px solid rgba(251, 191, 36, .20);
+  cursor: pointer;
+  text-align: start;
+  font-family: inherit;
+  color: #fff;
+  transition: transform .2s, box-shadow .3s, border-color .3s;
+}
+.rbx-btn .rbx-ico { display: flex; color: var(--hgold); flex-shrink: 0; }
+.rbx-btn .rbx-ico .ico {
+  width: 30px;
+  height: 30px;
+  filter: drop-shadow(0 3px 10px rgba(251, 191, 36, .35));
+}
+.rbx-btn .rbx-texts { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rbx-btn .rbx-label { font-size: 15.5px; font-weight: 900; color: #fff; }
+.rbx-btn .rbx-sub {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--hmut);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rbx-open { margin-inline-start: auto; flex-shrink: 0; display: flex; }
+.rbx-open-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 24px;
+  border-radius: 13px;
+  background: linear-gradient(160deg, #f87171, #dc2626);
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 900;
+  box-shadow:
+    0 6px 16px rgba(220, 38, 38, .4),
+    inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+.rbx-btn.disabled .rbx-open-btn { opacity: .55; box-shadow: none; }
+
+/* ⏱️ عدّاد التفعيل داخل اللافتة (مكان زر افتح حين لا تكون جاهزة) */
+.rbx-cd {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  direction: ltr;
+  font-size: 12.5px;
+  font-weight: 900;
+  color: #93c5fd;
+  background: rgba(59, 130, 246, .13);
+  border: 1px solid rgba(59, 130, 246, .35);
+  padding: 7px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* 🎬 الحالة الجاهزة: اهتزاز + حدود ذهبية متوهجة */
+.rbx-btn.ready {
+  border-color: rgba(251, 191, 36, .75);
+  box-shadow: 0 0 24px rgba(245, 158, 11, .30);
+  animation: rbxShake 1.15s ease-in-out infinite;
+}
+.rbx-btn.disabled { opacity: .55; filter: grayscale(.65); cursor: default; }
+@keyframes rbxShake {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(-1.2deg) scale(1.008); }
+  30% { transform: rotate(1.2deg); }
+  45% { transform: rotate(-1deg); }
+  60% { transform: rotate(1deg) scale(1.005); }
+  75% { transform: rotate(-.5deg); }
+}
+
+/* 🎬 علامة الفيديو العائمة */
+.rbx-video {
+  position: absolute;
+  top: -9px;
+  inset-inline-end: -6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: linear-gradient(160deg, #ef4444, #b91c1c);
+  border: 1.5px solid rgba(255, 255, 255, .5);
+  box-shadow: 0 4px 14px rgba(239, 68, 68, .55);
+  color: #fff;
+  animation: rbxBounce 1.4s ease-in-out infinite;
+  z-index: 2;
+}
+.rbx-video .ico { width: 14px; height: 14px; }
+@keyframes rbxBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.1); }
+}
+
+/* ------------------------------------------------------------
+   07 🧠 صف متجر الجوائز — سلة فيروزية + تقدم أصفر
+   ------------------------------------------------------------ */
+.awards-row {
+  width: 100%;
+  max-width: 400px;
+  margin: 10px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 12px 15px 13px;
+  border-radius: 17px;
+  background: linear-gradient(180deg, #131c3a 0%, #0d1428 100%);
+  border: 1px solid rgba(126, 150, 200, .17);
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform .15s, border-color .2s;
+  text-align: start;
+}
+.awards-row:hover { border-color: rgba(126, 150, 200, .35); }
+.awards-row:active { transform: scale(.98); }
+
+.awr-top { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.awr-ico { display: flex; color: var(--hteal); flex-shrink: 0; }
+.awr-ico .ico { width: 23px; height: 23px; }
+.awr-title { font-size: 15px; font-weight: 900; color: #fff; }
+.awr-frac {
+  margin-inline-start: auto;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--hmut);
+  flex-shrink: 0;
+}
+.awr-frac b { color: var(--hgold); font-size: 14.5px; font-weight: 900; }
+
+.awr-bar {
+  display: block;
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, .09);
+  overflow: hidden;
+}
+.awr-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #f59e0b, #fcd34d);
+  box-shadow: 0 0 8px rgba(251, 191, 36, .5);
+  transition: width .5s ease;
+}
+
+/* ------------------------------------------------------------
+   08 🎛️ الشريط السفلي — أيقونات فقط + زر الرئيسية الفيروزي
+   ------------------------------------------------------------ */
+.home-dock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: calc(100% - 28px);
+  max-width: 420px;
+  /* v17: يراعي شريط الإيماءات/الحواف الآمنة في هواتف iPhone وAndroid */
+  margin: auto auto calc(12px + env(safe-area-inset-bottom, 0px));
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(12, 18, 38, .94);
+  border: 1px solid rgba(126, 150, 200, .18);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .5);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.hd-btn {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #8090b8;
+  transition: color .2s, background .2s, transform .15s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.hd-btn:active { transform: scale(.9); }
+.hd-btn .dock-icon { display: flex; }
+.hd-btn .dock-icon .ico { width: 23px; height: 23px; }
+
+.hd-btn.on {
+  background: linear-gradient(160deg, #2dd4bf, #0f9d8e);
+  color: #04201c;
+  box-shadow:
+    0 8px 20px rgba(20, 184, 166, .45),
+    inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+
+/* ------------------------------------------------------------
+   09 🪟 نافذة قائمة الجوائز (تُفتح من صف متجر الجوائز)
+   ------------------------------------------------------------ */
+.awr-list { display: flex; flex-direction: column; gap: 9px; }
+.awr-balance {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #d8b4fe;
+  background: rgba(168, 85, 247, .10);
+  border: 1px solid rgba(168, 85, 247, .3);
+  border-radius: 12px;
+  padding: 9px 13px;
+  margin-bottom: 3px;
+}
+.awr-balance b { color: #fff; }
+.awr-balance .ico, .awr-balance .intel-ico .ico { width: 17px; height: 17px; }
+.awr-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: rgba(19, 28, 58, .8);
+  border: 1px solid rgba(126, 150, 200, .18);
+  border-radius: 15px;
+  padding: 10px 12px;
+}
+.awri-media {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(251, 191, 36, .10);
+  color: var(--hgold);
+}
+.awri-media img { width: 100%; height: 100%; object-fit: cover; }
+.awri-media .ico { width: 22px; height: 22px; }
+.awri-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.awri-name {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.awri-price {
+  font-size: 12px;
+  font-weight: 800;
+  color: #d8b4fe;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.awri-price .ico, .awri-price .intel-ico .ico { width: 14px; height: 14px; }
+.awri-btn { flex-shrink: 0; }
+
+/* ------------------------------------------------------------
+   10 📱 التجاوب الكامل — كل شاشات الهواتف (v17)
+   clamp() يتكفل بالعرض تلقائيًا، وهذه طبقات ضبط دقيق:
+   ------------------------------------------------------------ */
+
+/* 📱 هواتف صغيرة (≤360px): Galaxy A جيل أول وأشباهه */
+@media (max-width: 360px) {
+  .home-top { padding: 12px 14px 6px; }
+  .ht-tools { gap: 4px; }
+  .ht-pill { height: 36px; gap: 4px; padding-inline: 8px; font-size: 12px; }
+  .ht-pill .htp-ico .ico { width: 15px; height: 15px; }
+  .ht-round { width: 35px; height: 35px; }
+  .ht-hello { font-size: 11.5px; }
+  .ht-name { max-width: 128px; }
+  .lvl-row { margin-top: 16px; gap: 9px; }
+  .lvl-pill { font-size: 12px; padding: 6px 13px; }
+  .battle-btn { min-height: 60px; padding: 15px 14px; margin-top: 13px; }
+  .quick3 { gap: 8px; margin-top: 13px; }
+  .q-card { padding: 12px 4px 11px; border-radius: 15px; }
+  .box-mount { margin-top: 11px; }
+  .rbx-btn { padding: 11px 12px; gap: 10px; }
+  .rbx-btn .rbx-label { font-size: 14px; }
+  .rbx-open-btn { padding: 8px 18px; font-size: 13px; }
+  .rbx-cd { padding: 6px 11px; font-size: 11.5px; }
+  .awards-row { margin-top: 9px; padding: 11px 13px 12px; }
+  .awr-title { font-size: 13.5px; }
+  .home-dock { padding: 8px 14px; }
+  .hd-btn { width: 44px; height: 44px; }
+}
+
+/* 📱 هواتف صغيرة جدًا (≤320px): iPhone SE الجيل الأول — بلا أي فيض */
+@media (max-width: 330px) {
+  .home-top { padding: 10px 12px 5px; gap: 7px; }
+  .ht-hello { font-size: 10.5px; }
+  .ht-name { max-width: 104px; font-size: 15.5px; }
+  .ht-pill { padding: 0 9px; gap: 5px; }
+  .ht-pill .htp-ico .ico { width: 14px; height: 14px; }
+  .ht-round { width: 34px; height: 34px; }
+  .ht-round .ico { width: 17px; height: 17px; }
+  .hero-hex { width: 138px; height: 159px; }
+  .hex-inner { font-size: 52px; }
+  .lvl-row { gap: 7px; margin-top: 13px; }
+  .lvl-pill { font-size: 11px; padding: 5px 10px; }
+  .lvl-frac { font-size: 11px; }
+  .battle-btn { min-height: 56px; gap: 9px; font-size: 16px; padding: 13px 10px; margin-top: 11px; }
+  .battle-btn .bt-ico .ico { width: 21px; height: 21px; }
+  .quick3 { gap: 6px; margin-top: 11px; }
+  .q-card { padding: 10px 3px 9px; border-radius: 13px; }
+  .q-card .qc-label { font-size: 10px; }
+  .rbx-btn { padding: 10px 10px; gap: 8px; }
+  .rbx-btn .rbx-ico .ico { width: 22px; height: 22px; }
+  .rbx-btn .rbx-label { font-size: 12.5px; }
+  .rbx-btn .rbx-sub { font-size: 10px; }
+  .rbx-open-btn { padding: 7px 14px; font-size: 12px; }
+  .rbx-cd { padding: 5px 9px; font-size: 10.5px; }
+  .awards-row { padding: 10px 11px 11px; gap: 7px; }
+  .awr-title { font-size: 12.5px; }
+  .awr-ico .ico { width: 19px; height: 19px; }
+  .home-dock { padding: 7px 11px; }
+  .hd-btn { width: 40px; height: 40px; }
+  .hd-btn .dock-icon .ico { width: 20px; height: 20px; }
+}
+
+/* شاشات عريضة جدًا (تابلت/سطح مكتب): إبقاء العمود ضيقًا في الوسط
+   ⚠️ تسبق قواعد الارتفاع القصير عمدًا — قواعد max-height تلغيها
+   في الوضع الأفقي حتى لا يعود السداسي ضخمًا على هاتف بالعرض */
+@media (min-width: 520px) {
+  .hero-hex { width: 206px; height: 238px; }
+}
+
+/* 📱 شاشات قصيرة (ارتفاع ≤700px): هواتف عادية بالمتصفح — تقليل المسافات
+   حتى تظهر كل الهرمية بلا تمرير مزعج */
+@media (max-height: 700px) {
+  .home-top { padding-top: 10px; }
+  .hero-hex { width: clamp(128px, 38vw, 168px); height: clamp(147px, 44vw, 194px); }
+  .hex-inner { font-size: clamp(50px, 17vw, 64px); }
+  .lvl-row { margin-top: 12px; }
+  .battle-btn { margin-top: 10px; }
+  .quick3 { margin-top: 10px; }
+  .box-mount { margin-top: 10px; }
+  .awards-row { margin-top: 8px; }
+  .hex-glow { bottom: -14px; height: 22px; }
+}
+
+/* 📱 شاشات قصيرة جدًا (ارتفاع ≤600px): هواتف 16:9 قديمة + نوافذ مقسومة */
+@media (max-height: 600px) {
+  .hero-hex { width: 118px; height: 136px; }
+  .hex-inner { font-size: 44px; }
+  .lvl-row { margin-top: 9px; gap: 8px; }
+  .lvl-pill { font-size: 11px; padding: 5px 11px; }
+  .battle-btn { min-height: 56px; margin-top: 8px; padding: 12px 16px; }
+  .quick3 { margin-top: 8px; gap: 7px; }
+  .q-card { padding: 9px 4px 8px; }
+  .box-mount { margin-top: 8px; }
+  .rbx-btn { padding: 9px 12px; }
+  .rbx-btn .rbx-ico .ico { width: 22px; height: 22px; }
+  .awards-row { margin-top: 7px; padding: 9px 12px 10px; }
+  .home-dock { margin-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); padding: 6px 14px; }
+  .hd-btn { width: 40px; height: 40px; }
+}
+
+/* 📱 وضع أفقي (ارتفاع ≤440px): الهاتف بالعرض — تخطيط مضغوط صفّي */
+@media (max-height: 440px) {
+  .home-top { padding: 8px 16px 4px; }
+  .ht-name { font-size: 15px; max-width: 140px; }
+  .hero-hex { width: 92px; height: 106px; margin-top: 2px; }
+  .hex-inner { font-size: 34px; }
+  .hex-glow { bottom: -10px; height: 16px; }
+  .lvl-row { margin-top: 7px; }
+  .lvl-pill { font-size: 10.5px; padding: 4px 10px; }
+  .lvl-bar { height: 5px; }
+  .battle-btn { min-height: 54px; margin-top: 6px; padding: 10px 14px; font-size: 15px; gap: 8px; }
+  .battle-btn .bt-ico .ico { width: 18px; height: 18px; }
+  .quick3 { margin-top: 6px; gap: 6px; }
+  .q-card { padding: 7px 4px 6px; border-radius: 12px; }
+  .q-card .qc-ico .ico { width: 17px; height: 17px; }
+  .q-card .qc-label { font-size: 10px; }
+  .box-mount { margin-top: 6px; }
+  .rbx-btn { padding: 7px 10px; }
+  .rbx-btn .rbx-ico .ico { width: 18px; height: 18px; }
+  .rbx-btn .rbx-label { font-size: 11.5px; }
+  .rbx-btn .rbx-sub { display: none; }
+  .rbx-open-btn { padding: 6px 13px; font-size: 11px; }
+  .rbx-cd { padding: 4px 8px; font-size: 10px; }
+  .awards-row { margin-top: 5px; padding: 8px 11px 9px; gap: 5px; }
+  .awr-title { font-size: 11.5px; }
+  .awr-ico .ico { width: 16px; height: 16px; }
+  .awr-bar { height: 4px; }
+  .home-dock { margin-bottom: calc(6px + env(safe-area-inset-bottom, 0px)); padding: 5px 12px; }
+  .hd-btn { width: 36px; height: 36px; }
+  .hd-btn .dock-icon .ico { width: 18px; height: 18px; }
+}

@@ -1,0 +1,211 @@
+/* ==========================================================
+   v24.css — تحديثات طلب المستخدم (تحريك العجلة · ألوان اللاعبين ·
+   موضع العدّاد وزر الانسحاب · شاشة النهاية · المتصدرون)
+   ========================================================== */
+
+/* ═════════════ 1) 🎡 زر تحريك العجلة — نص الإعلان داخل الزر ═════════════ */
+.lw-spin-btn {
+  flex-direction: column;
+  gap: 3px;
+}
+.lw-spin-btn .lw-btn-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+}
+.lw-btn-ad {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, .82);
+  opacity: .92;
+  letter-spacing: .2px;
+  line-height: 1.2;
+}
+.lw-spin-btn.dim .lw-btn-ad { opacity: .55; }
+
+/* ═════════════ 2) ⏱️ العدّاد أسفل بطاقات اللاعبين — أصغر وأدنى ═════════════ */
+#view-game .game-3d > .timer {
+  bottom: 4px;
+  height: 42px;
+  min-width: 118px;
+  padding: 0 22px;
+  gap: 8px;
+  z-index: 26;
+}
+#view-game .game-3d > .timer .tm-num { font-size: 24px; }
+#view-game .game-3d > .timer .tm-ico .ico,
+#view-game .game-3d > .timer .tm-ico svg { width: 17px; height: 17px; }
+/* 🧯 مساحة محفوظة أسفل البطاقات كي لا تتداخل مع العدّاد */
+#view-game .duel-wrap { padding-bottom: clamp(66px, 9vh, 92px); }
+
+/* ═════════════ 3) 🚪 زر الانسحاب — الجهة اليسرى وبحجم أصغر ═════════════ */
+#view-game .game-3d > .exit-btn {
+  top: 8px;
+  inset-inline-end: auto !important;
+  inset-inline-start: 10px !important;
+  left: 10px !important;
+  right: auto !important;
+  padding: 4px 12px 5px !important;
+  font-size: 12.5px !important;
+  gap: 6px;
+}
+#view-game .game-3d > .exit-btn .ex-arrow .ico {
+  width: 13px !important;
+  height: 13px !important;
+}
+/* ↞ السهم يشير لليسار دائمًا (اتجاه الرئيسية) حتى في LTR */
+#view-game .game-3d > .exit-btn .ex-arrow svg.ico { transform: scaleX(1); }
+
+/* ═════════════ 4) 🎨 ألوان اللاعبين — الأخضر ضد 7 ألوان ═════════════
+   النمط الفردي: أخضر (أنت) ضد أحمر
+   الرباعية: أخضر · أحمر · أزرق · أصفر
+   8 ضد 8: أخضر + 7 ألوان — كل لاعب لونه الخاص (تحدي بينهم لا تحالف) */
+.pc-1 { --pc: #22c55e; }  /* 🟢 أنت دائمًا */
+.pc-2 { --pc: #ef4444; }  /* 🔴 */
+.pc-3 { --pc: #3b82f6; }  /* 🔵 */
+.pc-4 { --pc: #eab308; }  /* 🟡 */
+.pc-5 { --pc: #a855f7; }  /* 🟣 */
+.pc-6 { --pc: #f97316; }  /* 🟠 */
+.pc-7 { --pc: #06b6d4; }  /* 🩵 */
+.pc-8 { --pc: #ec4899; }  /* 🌸 */
+
+/* — نافذة تجهيز المباراة: إطار وشارة كل مقعد بلون اللاعب — */
+.wait-seat.pc-seat {
+  border-color: color-mix(in srgb, var(--pc) 65%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pc) 35%, transparent),
+              0 4px 12px color-mix(in srgb, var(--pc) 18%, transparent);
+}
+.wait-seat.pc-seat .slot-avatar {
+  outline: 2px solid color-mix(in srgb, var(--pc) 70%, transparent);
+  outline-offset: 2px;
+}
+.wait-seat.pc-seat .slot-name { color: color-mix(in srgb, var(--pc) 82%, #fff); }
+.wait-seat.pc-seat .pc-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--pc);
+  box-shadow: 0 0 7px var(--pc);
+  display: inline-block;
+  margin-inline-start: 5px;
+  flex: 0 0 auto;
+}
+
+/* — داخل الجولة: شرائح اللاعبين بألوانهم — */
+.ds-chip.pc-chip { border-color: color-mix(in srgb, var(--pc) 60%, transparent); }
+.ds-chip.pc-chip .ds-av {
+  box-shadow: 0 0 0 2px var(--pc), 0 0 10px color-mix(in srgb, var(--pc) 55%, transparent);
+}
+.ds-chip.pc-chip .ds-name { color: color-mix(in srgb, var(--pc) 85%, #fff); }
+.ds-chip.pc-chip .ds-mini-score { color: var(--pc); }
+
+/* — بطاقة نتائج نهاية الجولة: صف الفائز يحمل لونه — */
+.er-row.pc-row .er-avatar {
+  box-shadow: 0 0 0 2px var(--pc), 0 0 10px color-mix(in srgb, var(--pc) 50%, transparent);
+}
+.er-row.pc-row .er-name { color: color-mix(in srgb, var(--pc) 85%, #fff); }
+
+/* ═════════════ 5) 🏁 شاشة النهاية ═════════════ */
+/* ➕ زر الإضافة — تأثير ضغط + تحوّل إلى سهم مُرسل */
+.er-add {
+  transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+}
+.er-add:active { transform: scale(.88); }
+.er-add.sent {
+  background: linear-gradient(180deg, #34d399, #10b981) !important;
+  color: #05261c !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, .5) !important;
+  animation: er-send-pop .35s ease;
+}
+.er-add.sent .ico { width: 15px; height: 15px; display: block; }
+@keyframes er-send-pop {
+  0% { transform: scale(.6) rotate(-18deg); }
+  60% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+/* 🏠 زر «العودة» — أيقونة الرئيسية بجانب النص */
+#btn-back-main {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+#btn-back-main .ico { width: 18px; height: 18px; display: block; }
+
+/* ✖️2 نص المضاعفة الجديد */
+.end-double .ed-texts b { letter-spacing: .2px; }
+
+/* ═════════════ 6) 🏆 المتصدرون — أيقونات احترافية ═════════════ */
+.lb-iq { display: inline-flex; align-items: center; gap: 4px; }
+.lb-iq .ico { width: 15px; height: 15px; }
+.lb-iq.waiting .ico { opacity: .75; animation: lb-iq-pulse 1.6s ease-in-out infinite; }
+@keyframes lb-iq-pulse { 50% { opacity: .35; } }
+.lb-score .ico { width: 14px; height: 14px; opacity: .9; }
+
+/* ═════════════ 7) 🎬 شعار الإعلان — أيقونة كاميرا/فيديو احترافية ═════════════ */
+.ad-screen .ad-play { display: none; }
+.ad-screen .ad-cam { width: 64px; height: 64px; color: #ffd44d; filter: drop-shadow(0 0 14px rgba(255, 205, 80, .55)); }
+.ad-screen .ad-cam .ico { width: 100%; height: 100%; }
+
+/* ═════════════ 8) نافذة تجهيز المباراة — كل المقاعد ظاهرة ═════════════ */
+.prep-modal .modal-box { max-height: 92vh; }
+.prep-modal .modal-box #modal-body { overflow: visible; }
+.prep-win { max-height: 72vh; overflow-y: auto; scrollbar-width: thin; }
+.prep-versus { display: flex; flex-direction: column; gap: 10px; }
+.prep-team .wait-seats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 7px;
+}
+.prep-modal .wait-seat { min-height: 64px; padding: 7px 9px; }
+.prep-modal .slot-avatar { width: 40px; height: 40px; font-size: 21px; }
+/* زر ✕ إزالة الخصم (منشئ الجولة فقط) */
+.wait-seat .seat-x {
+  position: absolute;
+  top: 4px;
+  inset-inline-end: 5px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 120, 120, .75);
+  background: rgba(120, 20, 30, .55);
+  color: #ffb4b4;
+  font-size: 12px;
+  line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  z-index: 3;
+}
+.wait-seat .seat-x:hover { background: rgba(190, 30, 45, .8); color: #fff; }
+.wait-seat { position: relative; }
+
+/* ═════════════ 9) ✕2 المضاعفة الكلية — شارة الناتج ═════════════ */
+.end-reward .x2-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline-start: 8px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  background: linear-gradient(180deg, #fbbf24, #d97706);
+  color: #3b2200;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, .45);
+}
+
+/* ═════════════ 10) 🎯 وميض قسم الشخصيات عند الفوكاس من الملف ═════════════ */
+.store-section.focus-flash .ss-title {
+  animation: sec-flash 2.2s ease;
+}
+@keyframes sec-flash {
+  0%, 100% { color: inherit; }
+  25%, 75% { color: #ffd44d; text-shadow: 0 0 14px rgba(255, 205, 80, .6); }
+}
+.store-section.focus-flash {
+  animation: sec-glow 2.2s ease;
+  border-radius: 18px;
+}
+@keyframes sec-glow {
+  30% { background: rgba(255, 205, 80, .08); box-shadow: 0 0 24px rgba(255, 205, 80, .18); }
+}
