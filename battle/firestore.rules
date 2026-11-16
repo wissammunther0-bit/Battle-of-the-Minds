@@ -1,0 +1,298 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================================
+    // 🛡️ v41 — قواعد «معركة العقول» المشددة بالكامل (نسخة مجانية بلا جوائز)
+    //   موروث من v38 مع إغلاق كل الثغرات المتبقية:
+    //     1) gameStates/matchmaking/rooms: التحديث محكم (المضيف أو الأدمن
+    //        أو اللاعب يكتب مفتاح إجابته ونبضته فقط) — لا تزوير نتائج.
+    //     2) virtualPlayers/history: الأدمن فقط (لا «أي مصادق»).
+    //     3) حذف qtrans بالكامل (allow false) — لا ترجمة آلية.
+    //     4) حذف support/awards/awardClaims بالكامل (allow false).
+    //     5) حذف intel من economySane — عملتان فقط (tokens/gems).
+    //     6) إضافة consents (سجل الموافقات) و cheats و reports.
+    //     7) players create يتطلب agreedAdultAt + termsAcceptedAt.
+    //   ملاحظة: الحماية الكاملة للنتائج والاقتصاد تتطلب Cloud Functions
+    //   (انظر 5-functions/). القواعد هنا هي خط الدفاع الأول.
+    // ============================================================
+
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // 🚩 حقول الإدارة + البريد — يمنعها اللاعب على ملفه عند التعديل
+    function adminOnlyField() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasAny(['banned', 'frozenUntil', 'frozenReason', 'susReviewedAt',
+                 'role', 'isAdmin', 'email', 'deviceFingerprint']);
+    }
+
+    // 🚩 نفس الفحص عند الإنشاء — resource غير موجود أثناء create
+    function adminOnlyFieldCreate() {
+      return request.resource.data.diff({}).affectedKeys()
+        .hasAny(['banned', 'frozenUntil', 'frozenReason', 'susReviewedAt',
+                 'role', 'isAdmin', 'email', 'deviceFingerprint']);
+    }
+
+    // 🧮 حدود عقلانية للأرصدة — عملتان فقط (tokens/gems) بعد حذف intel
+    function economySane() {
+      return request.resource.data.get('tokens', 0) is number && request.resource.data.get('tokens', 0) <= 999999
+        && request.resource.data.get('gems', 0) is number && request.resource.data.get('gems', 0) <= 99999
+        && request.resource.data.get('wins', 0) is number && request.resource.data.get('wins', 0) <= 100000
+        && request.resource.data.get('losses', 0) is number && request.resource.data.get('losses', 0) <= 100000
+        && request.resource.data.get('roundsPlayed', 0) is number && request.resource.data.get('roundsPlayed', 0) <= 100000
+        && request.resource.data.get('correctAnswers', 0) is number && request.resource.data.get('correctAnswers', 0) <= 500000
+        && request.resource.data.get('wrongAnswers', 0) is number && request.resource.data.get('wrongAnswers', 0) <= 500000
+        && request.resource.data.get('totalAnswered', 0) is number && request.resource.data.get('totalAnswered', 0) <= 500000
+        && request.resource.data.get('fastAnswers', 0) is number && request.resource.data.get('fastAnswers', 0) <= 500000
+        && request.resource.data.get('answerMsSum', 0) is number && request.resource.data.get('answerMsSum', 0) <= 50000000000;
+    }
+
+    // 👤 اللاعبون: قراءة عامة — الكتابة: صاحب الملف (بحدود عقلانية وبلا
+    //    حقول إدارة) أو الأدمن. الإنشاء يتطلب بوابة عمر 18+ + موافقة الشروط.
+    match /players/{uid} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasAll(['agreedAdultAt', 'termsAcceptedAt', 'termsVersion', 'privacyAcceptedAt', 'privacyVersion'])
+        && !adminOnlyFieldCreate()
+        && economySane();
+      allow update: if request.auth != null
+        && ((request.auth.uid == uid
+             && !adminOnlyField()
+             && economySane())
+            || isAdmin());
+      allow delete: if request.auth != null
+        && (request.auth.uid == uid || isAdmin());
+
+      // 🔐 البيانات الخاصة (البريد إن ربط Google) — صاحبها والأدمن فقط
+      match /private/{doc} {
+        allow read, write: if request.auth != null
+          && (request.auth.uid == uid || isAdmin());
+      }
+
+      // 👥 قائمة أصدقاء اللاعب — الإنشاء لصاحب القائمة وحده
+      match /friends/{fid} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null && request.auth.uid == uid;
+        allow update, delete: if request.auth != null
+          && (request.auth.uid == uid
+              || resource.data.uid == request.auth.uid);
+      }
+
+      // 📜 سجل جولات اللاعب — صاحبه + الأدمن
+      match /history/{hid} {
+        allow read: if request.auth != null
+          && (request.auth.uid == uid || isAdmin());
+        allow create, update: if request.auth != null && request.auth.uid == uid;
+        allow delete: if request.auth != null
+          && (request.auth.uid == uid || isAdmin());
+      }
+    }
+
+    // 🚫 الحجر الأمني (tombstone) للاعبين المحظورين/المحذوفين
+    match /banned/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || isAdmin());
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ✉️ طلبات الصداقة — المشاركون فقط (from/to) مع تقييد الحقول
+    match /friendRequests/{id} {
+      allow read: if request.auth != null
+        && (resource.data.from == request.auth.uid
+            || resource.data.to == request.auth.uid
+            || isAdmin());
+      allow create: if request.auth != null
+        && request.resource.data.from == request.auth.uid
+        && request.resource.data.keys().hasAll(['from', 'to', 'status'])
+        && request.resource.data.to is string;
+      allow update: if request.auth != null
+        && (resource.data.from == request.auth.uid
+            || resource.data.to == request.auth.uid
+            || isAdmin())
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status', 'respondedAt', 'matched']);
+      allow delete: if request.auth != null
+        && (resource.data.from == request.auth.uid
+            || resource.data.to == request.auth.uid
+            || isAdmin());
+    }
+
+    // ⚔️ وثائق الجولات — v41 مشددة بالكامل:
+    //    الإنشاء للمضيف فقط، التحديث محكم (المضيف/الأدمن أو اللاعب يكتب
+    //    مفتاح إجابته ونبضته فقط)، الحذف للمضيف أو الأدمن.
+    function gameStatesOwnKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['answers', 'hb']);
+    }
+    match /gameStates/{id} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.hostId == request.auth.uid;
+      allow update: if request.auth != null
+        && (resource.data.hostId == request.auth.uid
+            || isAdmin()
+            || (gameStatesOwnKeys() && resource.data.hostId != request.auth.uid));
+      allow delete: if request.auth != null
+        && (isAdmin() || resource.data.hostId == request.auth.uid);
+    }
+
+    // 🎯 غرف المطابقة — v41: الإنشاء للمضيف، الانضمام فقط (لا تعديل hostId/pot)
+    match /matchmaking/{id} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.hostId == request.auth.uid
+        && request.resource.data.get('players', []).size() <= 12;
+      allow update: if request.auth != null
+        && request.resource.data.hostId == resource.data.hostId
+        && request.resource.data.get('players', resource.data.get('players', [])).size() <= 12;
+      allow delete: if request.auth != null
+        && (isAdmin() || resource.data.hostId == request.auth.uid);
+    }
+
+    // 🏠 الغرف المخصصة — v41: الإنشاء للمضيف، الحذف للمضيف أو الأدمن
+    match /rooms/{id} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.hostId == request.auth.uid
+        && request.resource.data.get('players', []).size() <= 16;
+      allow update: if request.auth != null
+        && request.resource.data.hostId == resource.data.hostId
+        && request.resource.data.get('players', []).size() <= 16;
+      allow delete: if request.auth != null
+        && (isAdmin() || resource.data.hostId == request.auth.uid);
+    }
+
+    // ⏱️ مزامنة وقت السيرفر — كتابة محدودة الحقول، حذف للأدمن
+    match /serverTime/{id} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null
+        && request.resource.data.keys().hasOnly(['clientSentAt', 'sessionId', 'at', 'rttMs', 'uid']);
+      allow delete: if isAdmin();
+    }
+
+    // ❓ أسئلة اللعبة: قراءة لكل المصادقين، كتابة للأدمن فقط
+    match /questions/{id} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 🛒 عناصر المتجر: قراءة للجميع، كتابة للأدمن (اللاعب يحديث إحصائية الشراء فقط)
+    function statsOnlyChanged() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['stats', 'statsCur', 'updatedAt']);
+    }
+    match /storeItems/{id} {
+      allow read: if request.auth != null;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin()
+        || (request.auth != null && statsOnlyChanged());
+    }
+
+    // 🛒 storeMeta — إعدادات المتجر + الإعلانات: قراءة للجميع، كتابة أدمن
+    match /storeMeta/{id} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // 🌍 تجاوزات الترجمة: قراءة عامة، كتابة أدمن
+    match /translations/{lang} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // 🎨 تجاوزات الأيقونات: قراءة للجميع، كتابة للأدمن فقط
+    match /iconOverrides/{key} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // 🛡️ قائمة الأدمن: القراءة لصاحب الوثيقة فقط، بلا كتابة من العميل
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // 🤖 اللاعبون الافتراضيون — v41: الأدمن فقط للكل (لا «أي مصادق»)
+    match /virtualPlayers/{vpid} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if isAdmin();
+      match /history/{hid} {
+        allow read: if request.auth != null;
+        allow create, update, delete: if isAdmin();
+      }
+    }
+
+    // 🏦 gameMeta — v41 مقسمة بدقة:
+    //    · tank  : الخزان — زيادات من أجهزة اللاعبين مع قيود
+    //    · days  : سجلات الأيام — زيادات محدودة الحقول
+    //    · الباقي : الأدمن فقط
+    function tankSane() {
+      return request.resource.data.get('tankTokens', 0) is number
+          && request.resource.data.get('tankTokens', 0) <= 100000000
+        && request.resource.data.get('adsViewed', 0) is number
+          && request.resource.data.get('adsViewed', 0) <= 100000000
+        && request.resource.data.get('roundsPlayed', 0) is number
+          && request.resource.data.get('roundsPlayed', 0) <= 100000000;
+    }
+    match /gameMeta/tank {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().size() <= 30
+        && tankSane();
+      allow delete: if isAdmin();
+      match /days/{docId} {
+        allow read, create, update: if request.auth != null;
+        allow delete: if isAdmin();
+      }
+    }
+    match /gameMeta/{log}/days/{docId} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().size() <= 40;
+      allow delete: if isAdmin();
+    }
+    match /gameMeta/{id} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 📨 الإبلاغات (جديد v41) — إنشاء لأي مصادق بحقول محددة، قراءة/حذف للأدمن
+    //    (تقرير مخالفات بلا محادثة ولا رد — يحل محل الدعم الفني)
+    match /reports/{id} {
+      allow read: if isAdmin();
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['type', 'targetUid', 'targetQid', 'reason', 'reporterUid', 'at'])
+        && request.resource.data.reporterUid == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // 📜 سجل الموافقات (جديد v41) — كتابة مرة واحدة عند الموافقة، قراءة لصاحبها والأدمن
+    //    v41.1: مجموعة علوية consents/{uid} (كان audit/consents/{uid} بـ3 مقاطع — غير صالح)
+    match /consents/{uid} {
+      allow read: if request.auth != null
+        && (request.auth.uid == uid || isAdmin());
+      allow create: if request.auth != null && request.auth.uid == uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // 🚨 سجل الغش (جديد v41) — قراءة/كتابة للأدمن فقط
+    //    v41.1: مجموعة علوية cheats/{uid} (كان audit/cheats/{uid} بـ3 مقاطع — غير صالح)
+    match /cheats/{uid} {
+      allow read, write: if isAdmin();
+    }
+
+    // ══════════════════════════════════════════════════════════
+    //   🚫 مجموعات محظورة بالكامل (محذوفة في v41)
+    // ══════════════════════════════════════════════════════════
+    // qtrans — حُذفت الترجمة الآلية بالكامل (لغتان فقط: ar/en يدويًا)
+    match /qtrans/{id} { allow read, write: if false; }
+    // supportTickets — حُذف الدعم الفني بالكامل
+    match /supportTickets/{id} { allow read, write: if false; }
+    // awards / awardClaims — حُذفت الجوائز الحقيقية بالكامل (اللعبة مجانية)
+    match /awards/{id} { allow read, write: if false; }
+    match /awardClaims/{id} { allow read, write: if false; }
+  }
+}

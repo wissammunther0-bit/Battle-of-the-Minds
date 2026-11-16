@@ -1,0 +1,73 @@
+/* styles/v40.css — v40
+   ============================================================
+   🪑 تجهيز المباراة: كل اللاعبين ظاهرون دفعة واحدة بلا شريط تمرير
+   (طلب المالك 15-11-2026): سابقًا كانت النافذة محدودة بـ72vh مع
+   تمرير رأقي داخلي فيُقص اللاعبون — الآن النافذة تملأ الشاشة،
+   ومساحة المقاعد تتمدد وتوزّع الصفوف بالتساوي، وتحدي الثمانية
+   يبقى 4 أعمدة × صفّين حتى على الجوال فيظهر الجميع كاملين.
+   ============================================================ */
+
+/* 1) النافذة تملأ المساحة المتاحة بدل حد 72vh القاطع
+      (التمرير يبقى احتياطًا للشاشات القصيرة جدًا فقط — انظر 5) */
+.prep-win {
+  width: 100%;
+  max-width: none;
+  max-height: 100%;
+  overflow: visible;
+}
+
+/* 2) مساحة المقاعد تتمدد وتوزّع الصفوف بالتساوي — لا قص ولا تمرير */
+.prep-win .wait-teams {
+  overflow: visible;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: none;
+}
+.prep-win .wait-teams::-webkit-scrollbar { display: none; }
+.prep-win .wait-teams .prep-team {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+.prep-win .wait-teams .prep-team .wait-seats {
+  flex: 1 1 auto;
+  align-content: space-evenly;
+}
+
+/* 3) تحدي الثمانية: 4 أعمدة × صفّين في كل الأحجام — بما فيها الجوال —
+      كي يظهر الصفّان كاملان فوق بعضهما بلا تمرير، مع تصغير متناسق
+      لخلايا الجوال كي تتنفس.
+      ⚠️ خصوصية مرتفعة (4 مقاطع) لحسم المعركة مع قاعدة v19 القديمة
+      .wait-seats:has(.wait-seat:nth-child(2)) التي كانت تفرض عمودين
+      وتغلب قواعد data-cap في v33 — سبب الشريط المختفي أصلاً */
+.prep-win .wait-teams .prep-team .wait-seats[data-cap="8"] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+@media (max-width: 620px) {
+  .prep-win .wait-teams .prep-team .wait-seats[data-cap="8"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .wait-seats[data-cap="8"] .wait-seat { gap: 4px; min-height: 54px; padding: 5px 6px; }
+  .wait-seats[data-cap="8"] .wait-seat .slot-avatar {
+    width: clamp(38px, 10.5vw, 60px);
+    height: clamp(44px, 12.5vw, 70px);
+    border-width: 2.5px;
+    font-size: clamp(16px, 4.2vw, 30px);
+  }
+  .wait-seats[data-cap="8"] .wait-seat .slot-name { font-size: clamp(8.5px, 2.3vw, 12px); }
+  .wait-seats[data-cap="8"] .slot-lvl { margin-top: 2px; padding: 1px 6px; font-size: clamp(8.5px, 2vw, 10px); }
+  .wait-seats[data-cap="8"] .wait-seat .slot-status { margin-top: 1px; font-size: 9px; }
+}
+
+/* 4) إلغاء تمرير الشاشات القصيرة العريضة (كان يخفي صفًا كاملًا) */
+@media (min-width: 700px) and (min-height: 521px) and (max-height: 800px) {
+  .prep-win .wait-teams { overflow: visible; }
+}
+
+/* 5) احتياط أخير: هاتف بالوضع الأفقي القصير جدًا — تمرير فقط عند
+      استحالة العرض الكامل، بدل قصّ اللاعبين */
+@media (max-height: 430px) {
+  .prep-win { overflow-y: auto; scrollbar-width: thin; }
+}
