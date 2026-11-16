@@ -14,6 +14,7 @@ import { initializeFirestore, memoryLocalCache } from 'https://www.gstatic.com/f
 //    2) Authentication ← Settings ← Authorized domains ← أضف localhost
 //       + نطاق النشر (مثلاً wissammunther0-bit.github.io).
 //    3) أنشئ وثيقة admins/{uid} لحسابك في Firestore (انظر دليل النشر).
+window.APP_CHECK_FORCE_OFF = true;
 export const firebaseConfig = {
   apiKey: "AIzaSyC8UJLG-f8c9GkAEnmAWn-hWM8qtT7ReZM",
   authDomain: "world-adf78.firebaseapp.com",
